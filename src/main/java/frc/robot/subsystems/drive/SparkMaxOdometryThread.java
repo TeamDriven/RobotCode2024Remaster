@@ -1,25 +1,18 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.wpilibj.Notifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -29,10 +22,8 @@ import org.littletonrobotics.junction.Logger;
  * blocking thread. A Notifier thread is used to gather samples with consistent timing.
  */
 public class SparkMaxOdometryThread {
-  private List<Supplier<OptionalDouble>> signals = new ArrayList<>();
+  private List<DoubleSupplier> signals = new ArrayList<>();
   private List<Queue<Double>> queues = new ArrayList<>();
-  private List<Queue<Double>> timestampQueues = new ArrayList<>();
-
   private final Notifier notifier;
   private static SparkMaxOdometryThread instance = null;
 
@@ -46,15 +37,10 @@ public class SparkMaxOdometryThread {
   private SparkMaxOdometryThread() {
     notifier = new Notifier(this::periodic);
     notifier.setName("SparkMaxOdometryThread");
+    notifier.startPeriodic(1.0 / DriveConstants.odometryFrequency);
   }
 
-  public void start() {
-    if (timestampQueues.size() > 0) {
-      notifier.startPeriodic(1.0 / Module.ODOMETRY_FREQUENCY);
-    }
-  }
-
-  public Queue<Double> registerSignal(Supplier<OptionalDouble> signal) {
+  public Queue<Double> registerSignal(DoubleSupplier signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     Drive.odometryLock.lock();
     try {
@@ -66,39 +52,12 @@ public class SparkMaxOdometryThread {
     return queue;
   }
 
-  public Queue<Double> makeTimestampQueue() {
-    Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Drive.odometryLock.lock();
-    try {
-      timestampQueues.add(queue);
-    } finally {
-      Drive.odometryLock.unlock();
-    }
-    return queue;
-  }
-
   private void periodic() {
     Drive.odometryLock.lock();
-    double timestamp = Logger.getRealTimestamp() / 1e6;
+    Drive.timestampQueue.offer(Logger.getRealTimestamp() / 1.0e6);
     try {
-      double[] values = new double[signals.size()];
-      boolean isValid = true;
       for (int i = 0; i < signals.size(); i++) {
-        OptionalDouble value = signals.get(i).get();
-        if (value.isPresent()) {
-          values[i] = value.getAsDouble();
-        } else {
-          isValid = false;
-          break;
-        }
-      }
-      if (isValid) {
-        for (int i = 0; i < queues.size(); i++) {
-          queues.get(i).offer(values[i]);
-        }
-        for (int i = 0; i < timestampQueues.size(); i++) {
-          timestampQueues.get(i).offer(timestamp);
-        }
+        queues.get(i).offer(signals.get(i).getAsDouble());
       }
     } finally {
       Drive.odometryLock.unlock();

@@ -1,131 +1,121 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.drive.*;
+import frc.robot.util.*;
+import frc.robot.util.Alert.AlertType;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+  private Drive drive;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driver = new CommandXboxController(0);
+
+  private final Alert driverDisconnected =
+      new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  // private final AutoSelector autoSelector = new AutoSelector("Auto");
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(true),
-                new ModuleIOTalonFX(0),
-                new ModuleIOTalonFX(1),
-                new ModuleIOTalonFX(2),
-                new ModuleIOTalonFX(3));
-        break;
-
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        break;
-
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        break;
+    // Create subsystems
+    if (Constants.getMode() != Constants.Mode.REPLAY) {
+      switch (Constants.getRobot()) {
+        case COMPBOT -> {
+          drive =
+              new Drive(
+                  new GyroIOPigeon2(true),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
+        }
+        case DEVBOT -> {
+          drive =
+              new Drive(
+                  new GyroIOPigeon2(false),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
+        }
+        case SIMBOT -> {
+          drive =
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIOSim(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOSim(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOSim(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOSim(DriveConstants.moduleConfigs[3]));
+        }
+      }
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    // No-op implementation for replay
+    if (drive == null) {
+      drive =
+          new Drive(
+              new GyroIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {});
+    }
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Configure autos and buttons
+    configureButtonBindings(false);
 
-    // Configure the button bindings
-    configureButtonBindings();
+    // Alerts for constants
+    if (Constants.tuningMode) {
+      new Alert("Tuning mode enabled", AlertType.INFO).set(true);
+    }
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link Joystick} or {@link
+   * XboxController}), and then passing it to a {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureButtonBindings(boolean demo) {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+
+    // ------------- Driver Controls -------------
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+        drive
+            .run(
+                () ->
+                    drive.acceptTeleopInput(
+                        -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
+            .withName("Drive Teleop Input"));
+  }
+
+  /** Updates the alerts for disconnected controllers. */
+  public void checkControllers() {
+    driverDisconnected.set(
+        !DriverStation.isJoystickConnected(driver.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
+  }
+
+  /** Updates dashboard data. */
+  public void updateDashboardOutputs() {
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 
   /**
@@ -134,6 +124,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    // return autoSelector.getCommand();
+    return null;
   }
 }
