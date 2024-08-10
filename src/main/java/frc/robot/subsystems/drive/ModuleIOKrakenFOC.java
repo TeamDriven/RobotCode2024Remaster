@@ -14,13 +14,12 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,7 +29,7 @@ public class ModuleIOKrakenFOC implements ModuleIO {
   // Hardware
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
-  private final AnalogInput turnAbsoluteEncoder;
+  private final CANcoder turnAbsoluteEncoder;
   private final Rotation2d absoluteEncoderOffset;
 
   // Status Signals
@@ -67,9 +66,10 @@ public class ModuleIOKrakenFOC implements ModuleIO {
 
   public ModuleIOKrakenFOC(ModuleConfig config) {
     // Init controllers and encoders from config constants
-    driveTalon = new TalonFX(config.driveID(), "*");
-    turnTalon = new TalonFX(config.turnID(), "*");
-    turnAbsoluteEncoder = new AnalogInput(config.absoluteEncoderChannel());
+    driveTalon = new TalonFX(config.driveID());
+    turnTalon = new TalonFX(config.turnID());
+    // turnAbsoluteEncoder = new AnalogInput(config.absoluteEncoderChannel());
+    turnAbsoluteEncoder = new CANcoder(config.absoluteEncoderChannel());
     absoluteEncoderOffset = config.absoluteEncoderOffset();
 
     // Config Motors
@@ -115,11 +115,7 @@ public class ModuleIOKrakenFOC implements ModuleIO {
     driveTorqueCurrent = driveTalon.getTorqueCurrent();
     turnAbsolutePosition =
         () ->
-            Rotation2d.fromRadians(
-                    turnAbsoluteEncoder.getVoltage()
-                        / RobotController.getVoltage5V()
-                        * 2.0
-                        * Math.PI)
+            Rotation2d.fromRotations(turnAbsoluteEncoder.getAbsolutePosition().getValueAsDouble())
                 .minus(absoluteEncoderOffset);
     turnVelocity = turnTalon.getVelocity();
     turnAppliedVolts = turnTalon.getMotorVoltage();

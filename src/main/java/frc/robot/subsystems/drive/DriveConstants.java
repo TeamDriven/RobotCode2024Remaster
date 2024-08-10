@@ -24,25 +24,25 @@ public final class DriveConstants {
   public static final DriveConfig driveConfig =
       switch (Constants.getRobot()) {
         case SIMBOT, COMPBOT -> new DriveConfig(
-            Units.inchesToMeters(1.891),
-            Units.inchesToMeters(20.75),
-            Units.inchesToMeters(20.75),
-            Units.inchesToMeters(37),
-            Units.inchesToMeters(33),
-            Units.feetToMeters(15.0),
+            Units.inchesToMeters(2.0), // MIGHT GET FROM CHARACTERIZATION
+            Units.inchesToMeters(18.625),
+            Units.inchesToMeters(18.625),
+            Units.inchesToMeters(30),
+            Units.inchesToMeters(30.75),
+            Units.feetToMeters(15.0), // CHARACTERIZATION GETS THESE 4 (I think)
             Units.feetToMeters(75.0),
             12.0,
             6.0);
         case DEVBOT -> new DriveConfig(
-            Units.inchesToMeters(2.01834634),
-            Units.inchesToMeters(20.75),
-            Units.inchesToMeters(20.75),
-            Units.inchesToMeters(37),
-            Units.inchesToMeters(33),
-            Units.feetToMeters(12.16),
-            Units.feetToMeters(21.32),
-            7.93,
-            29.89);
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0),
+            Units.feetToMeters(0),
+            Units.feetToMeters(0),
+            0,
+            0);
       };
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
@@ -71,16 +71,16 @@ public final class DriveConstants {
   public static final ModuleConfig[] moduleConfigs =
       switch (Constants.getRobot()) {
         case COMPBOT -> new ModuleConfig[] {
-          new ModuleConfig(16, 12, 0, new Rotation2d(-0.81761), true),
-          new ModuleConfig(19, 14, 1, new Rotation2d(1.80875), true),
-          new ModuleConfig(17, 13, 2, new Rotation2d(-0.48936), true),
-          new ModuleConfig(18, 15, 3, new Rotation2d(-1.52578), true)
+          new ModuleConfig(1, 2, 3, new Rotation2d(0.011), true),
+          new ModuleConfig(4, 5, 6, new Rotation2d(-3.140), true),
+          new ModuleConfig(7, 8, 9, new Rotation2d(0.021), true),
+          new ModuleConfig(10, 11, 12, new Rotation2d(3.128), true)
         };
         case DEVBOT -> new ModuleConfig[] {
-          new ModuleConfig(15, 11, 0, new Rotation2d(-0.036), true),
-          new ModuleConfig(12, 9, 1, new Rotation2d(1.0185), true),
-          new ModuleConfig(14, 10, 2, new Rotation2d(1.0705), true),
-          new ModuleConfig(13, 8, 3, new Rotation2d(0.7465), true)
+          new ModuleConfig(1, 2, 3, new Rotation2d(0), true),
+          new ModuleConfig(4, 5, 6, new Rotation2d(0), true),
+          new ModuleConfig(7, 8, 9, new Rotation2d(0), true),
+          new ModuleConfig(10, 11, 12, new Rotation2d(0), true)
         };
         case SIMBOT -> {
           ModuleConfig[] configs = new ModuleConfig[4];
@@ -100,17 +100,17 @@ public final class DriveConstants {
             0.0,
             4000.0,
             50.0,
-            Mk4iReductions.L3.reduction,
+            5.357142857142857,
             Mk4iReductions.TURN.reduction);
         case DEVBOT -> new ModuleConstants(
-            0.1,
-            0.13,
+            0.014,
+            0.134,
             0.0,
             0.1,
             0.0,
             10.0,
             0.0,
-            Mk4iReductions.L2.reduction,
+            Mk4iReductions.L3.reduction,
             Mk4iReductions.TURN.reduction);
         case SIMBOT -> new ModuleConstants(
             0.014,

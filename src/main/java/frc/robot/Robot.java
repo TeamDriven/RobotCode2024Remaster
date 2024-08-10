@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.Mode;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.VirtualSubsystem;
@@ -38,21 +36,21 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
-  private static final double canivoreErrorTimeThreshold = 0.5;
+  // private static final double canivoreErrorTimeThreshold = 0.5;
 
   private Command autoCommand;
   private RobotContainer robotContainer;
   private final Timer disabledTimer = new Timer();
   private final Timer canInitialErrorTimer = new Timer();
   private final Timer canErrorTimer = new Timer();
-  private final Timer canivoreErrorTimer = new Timer();
+  // private final Timer canivoreErrorTimer = new Timer();
   private double teleStart;
   private static double teleElapsedTime = 0.0;
 
   private final Alert canErrorAlert =
       new Alert("CAN errors detected, robot may not be controllable.", AlertType.ERROR);
-  private final Alert canivoreErrorAlert =
-      new Alert("CANivore error detected, robot may not be controllable.", AlertType.ERROR);
+  // private final Alert canivoreErrorAlert =
+  //     new Alert("CANivore error detected, robot may not be controllable.", AlertType.ERROR);
   private final Alert gcAlert =
       new Alert("Please wait to enable, collecting garbage.", AlertType.WARNING);
 
@@ -92,7 +90,8 @@ public class Robot extends LoggedRobot {
     switch (Constants.getMode()) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        // TODO: figure this out
+        // Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -143,7 +142,7 @@ public class Robot extends LoggedRobot {
     // Reset alert timers
     canInitialErrorTimer.restart();
     canErrorTimer.restart();
-    canivoreErrorTimer.restart();
+    // canivoreErrorTimer.restart();
     disabledTimer.restart();
 
     RobotController.setBrownoutVoltage(6.0);
@@ -170,24 +169,24 @@ public class Robot extends LoggedRobot {
         !canErrorTimer.hasElapsed(canErrorTimeThreshold)
             && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
 
-    // Log CANivore status
-    if (Constants.getMode() == Mode.REAL) {
-      var canivoreStatus = CANBus.getStatus("canivore");
-      Logger.recordOutput("CANivoreStatus/Status", canivoreStatus.Status.getName());
-      Logger.recordOutput("CANivoreStatus/Utilization", canivoreStatus.BusUtilization);
-      Logger.recordOutput("CANivoreStatus/OffCount", canivoreStatus.BusOffCount);
-      Logger.recordOutput("CANivoreStatus/TxFullCount", canivoreStatus.TxFullCount);
-      Logger.recordOutput("CANivoreStatus/ReceiveErrorCount", canivoreStatus.REC);
-      Logger.recordOutput("CANivoreStatus/TransmitErrorCount", canivoreStatus.TEC);
-      if (!canivoreStatus.Status.isOK()
-          || canStatus.transmitErrorCount > 0
-          || canStatus.receiveErrorCount > 0) {
-        canivoreErrorTimer.restart();
-      }
-      canivoreErrorAlert.set(
-          !canivoreErrorTimer.hasElapsed(canivoreErrorTimeThreshold)
-              && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
-    }
+    // // Log CANivore status
+    // if (Constants.getMode() == Mode.REAL) {
+    //   var canivoreStatus = CANBus.getStatus("canivore");
+    //   Logger.recordOutput("CANivoreStatus/Status", canivoreStatus.Status.getName());
+    //   Logger.recordOutput("CANivoreStatus/Utilization", canivoreStatus.BusUtilization);
+    //   Logger.recordOutput("CANivoreStatus/OffCount", canivoreStatus.BusOffCount);
+    //   Logger.recordOutput("CANivoreStatus/TxFullCount", canivoreStatus.TxFullCount);
+    //   Logger.recordOutput("CANivoreStatus/ReceiveErrorCount", canivoreStatus.REC);
+    //   Logger.recordOutput("CANivoreStatus/TransmitErrorCount", canivoreStatus.TEC);
+    //   if (!canivoreStatus.Status.isOK()
+    //       || canStatus.transmitErrorCount > 0
+    //       || canStatus.receiveErrorCount > 0) {
+    //     canivoreErrorTimer.restart();
+    //   }
+    // canivoreErrorAlert.set(
+    //     !canivoreErrorTimer.hasElapsed(canivoreErrorTimeThreshold)
+    //         && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
+    // }
 
     // GC alert
     gcAlert.set(Timer.getFPGATimestamp() < 45.0);

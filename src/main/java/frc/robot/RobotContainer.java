@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.drive.*;
@@ -21,6 +24,8 @@ import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
 
 public class RobotContainer {
+  private final RobotState robotState = RobotState.getInstance();
+
   // Subsystems
   private Drive drive;
 
@@ -104,6 +109,17 @@ public class RobotContainer {
                     drive.acceptTeleopInput(
                         -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
             .withName("Drive Teleop Input"));
+
+    driver
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        robotState.resetPose(
+                            new Pose2d(
+                                robotState.getEstimatedPose().getTranslation(),
+                                AllianceFlipUtil.apply(new Rotation2d()))))
+                .ignoringDisable(true));
   }
 
   /** Updates the alerts for disconnected controllers. */

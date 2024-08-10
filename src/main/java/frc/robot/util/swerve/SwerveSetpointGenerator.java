@@ -7,7 +7,9 @@
 
 package frc.robot.util.swerve;
 
-import static frc.robot.util.EqualsUtil.*;
+import static frc.robot.Constants.loopPeriodSecs;
+import static frc.robot.util.EqualsUtil.GeomExtensions.epsilonEquals;
+import static frc.robot.util.EqualsUtil.epsilonEquals;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,9 +43,10 @@ public class SwerveSetpointGenerator {
   private boolean epsilonEqualsTwist2D(ChassisSpeeds speeds) {
     return epsilonEquals(
         new Twist2d(
-                speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond)
-            .dtheta,
-        new Twist2d().dtheta);
+            speeds.vxMetersPerSecond * loopPeriodSecs,
+            speeds.vyMetersPerSecond * loopPeriodSecs,
+            speeds.omegaRadiansPerSecond * loopPeriodSecs),
+        new Twist2d());
   }
 
   /**
