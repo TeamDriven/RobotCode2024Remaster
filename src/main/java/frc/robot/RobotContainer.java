@@ -107,7 +107,7 @@ public class RobotContainer {
             .run(
                 () ->
                     drive.acceptTeleopInput(
-                        -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
+                        -driver.getRightY(), -driver.getRightX(), -driver.getLeftX(), false))
             .withName("Drive Teleop Input"));
 
     driver
@@ -140,7 +140,24 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return autoSelector.getCommand();
+
+    // Drive Static Characterization
+    // return new StaticCharacterization(
+    //         drive, drive::runCharacterization, drive::getCharacterizationVelocity)
+    //     .finallyDo(drive::endCharacterization);
+
+    // Drive FF Characterization
+    // return new FeedForwardCharacterization(
+    //         drive, drive::runCharacterization, drive::getCharacterizationVelocity)
+    //     .finallyDo(drive::endCharacterization);
+
+    // Drive Wheel Radius Characterization
+    // return drive
+    //     .orientModules(Drive.getCircleOrientations())
+    //     .andThen(
+    //         new WheelRadiusCharacterization(
+    //             drive, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE))
+    //     .withName("Drive Wheel Radius Characterization");
     return null;
   }
 }

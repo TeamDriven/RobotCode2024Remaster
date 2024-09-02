@@ -24,7 +24,7 @@ public final class DriveConstants {
   public static final DriveConfig driveConfig =
       switch (Constants.getRobot()) {
         case SIMBOT, COMPBOT -> new DriveConfig(
-            Units.inchesToMeters(2.0), // MIGHT GET FROM CHARACTERIZATION
+            Units.inchesToMeters(1.924510128130523), // Get from Wheel Radius Characterization
             Units.inchesToMeters(18.625),
             Units.inchesToMeters(18.625),
             Units.inchesToMeters(30),
@@ -93,14 +93,14 @@ public final class DriveConstants {
   public static final ModuleConstants moduleConstants =
       switch (Constants.getRobot()) {
         case COMPBOT -> new ModuleConstants(
-            5.0,
-            0.0,
+            5.60284, // Get these two from FeedForwardCharacterization
+            0.07320,
             1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
             35.0,
             0.0,
             4000.0,
             50.0,
-            5.357142857142857,
+            5.357142857142857, // L3 16 tooth
             Mk4iReductions.TURN.reduction);
         case DEVBOT -> new ModuleConstants(
             0.014,
