@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -117,8 +118,8 @@ public class RobotContainer {
                     () ->
                         robotState.resetPose(
                             new Pose2d(
-                                robotState.getEstimatedPose().getTranslation(),
-                                AllianceFlipUtil.apply(new Rotation2d()))))
+                                // robotState.getEstimatedPose().getTranslation(),
+                                new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
                 .ignoringDisable(true));
   }
 
@@ -158,6 +159,6 @@ public class RobotContainer {
     //         new WheelRadiusCharacterization(
     //             drive, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE))
     //     .withName("Drive Wheel Radius Characterization");
-    return null;
+    return drive.getAutoPath("New Auto");
   }
 }
