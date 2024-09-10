@@ -7,6 +7,9 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.*;
+import static frc.robot.Subsystems.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -17,20 +20,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.AngleControllerConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.SlapperConstants;
+import frc.robot.commands.automation.PickUpPiece;
+import frc.robot.commands.automation.ShootSequence;
+import frc.robot.commands.automation.StopIntake;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
 
 public class RobotContainer {
   private final RobotState robotState = RobotState.getInstance();
-
-  // Subsystems
-  private Drive drive;
-
-  // Controller
-  private final CommandXboxController driver = new CommandXboxController(0);
 
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
@@ -120,6 +123,21 @@ public class RobotContainer {
                                 robotState.getEstimatedPose().getTranslation(),
                                 AllianceFlipUtil.apply(new Rotation2d()))))
                 .ignoringDisable(true));
+
+    driver
+        .rightBumper()
+        .whileTrue(new PickUpPiece(IntakeConstants.intakeVoltage))
+        .onFalse(new StopIntake());
+
+    driver
+        .rightTrigger(0.1)
+        .onTrue(
+            new ShootSequence(
+                () -> AngleControllerConstants.subwooferShotAngle,
+                () -> ShooterConstants.subwooferShotSpeed,
+                AngleControllerConstants.angleRestingPosition,
+                () -> SlapperConstants.slapperRestingPosition,
+                SlapperConstants.slapperRestingPosition));
   }
 
   /** Updates the alerts for disconnected controllers. */
