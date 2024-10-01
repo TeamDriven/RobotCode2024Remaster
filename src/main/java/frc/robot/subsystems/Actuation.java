@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The Actuation subsystem controls the actuation motor that moves a mechanism to a specific
@@ -266,6 +267,13 @@ public class Actuation extends SubsystemBase {
 
   @Override
   public void periodic() {
+    Logger.recordOutput(
+        "Actuation/EncoderAngle",
+        (throughboreEncoder.getAbsolutePosition() / actuationTicksPerDegree) - actuationOffset);
+    Logger.recordOutput(
+        "Actuation/MotorAngle",
+        actuationMotor.getPosition().getValueAsDouble() / actuationInternalTicksPerDegree);
+
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("isPosControl", isPositionControl);
     if (isPositionControl) {

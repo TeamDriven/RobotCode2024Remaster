@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The Shooter class represents the subsystem responsible for controlling the shooter mechanism. It
@@ -519,6 +520,7 @@ public class Shooter extends SubsystemBase {
    *
    * @return a double representing the left shooter velocity
    */
+  // @AutoLogOutput(key = "Shooter/LeftVelocity")
   public double getLeftVelocity() {
     return leftShooterMotor.getVelocity().getValueAsDouble();
   }
@@ -528,12 +530,15 @@ public class Shooter extends SubsystemBase {
    *
    * @return a double representing the right shooter velocity
    */
+  // @AutoLogOutput(key = "Shooter/RightVelocity")
   public double getRightVelocity() {
     return rightShooterMotor.getVelocity().getValueAsDouble();
   }
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Shooter/LeftVelocity", getLeftVelocity());
+    Logger.recordOutput("Shooter/RightVelocity", getRightVelocity());
     // This method will be called once per scheduler run
     // System.out.println(pdp.getCurrent(16));
     // System.out.println("Right Velocity:" + rightShooterMotor.getVelocity().getValueAsDouble());

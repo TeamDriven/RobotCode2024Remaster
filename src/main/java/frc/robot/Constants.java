@@ -89,7 +89,7 @@ public final class Constants {
     public static double actuationPickUpPosition = 98; // 100
     public static final double actuationTuckPosition = -63.3;
 
-    public static final double actuationOffset = 0.0 - actuationStartPosition;
+    public static final double actuationOffset = 1.5 - actuationStartPosition;
   }
 
   public final class IntakeConstants {
