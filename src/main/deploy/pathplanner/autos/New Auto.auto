@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 6.0,
-      "y": 4.0
+      "x": 1.3959954881393342,
+      "y": 5.4806715034257465
     },
-    "rotation": 0.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path1"
+            "pathName": "pickUpNote1Blue"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New Path2"
+            "pathName": "pickUpNote2Blue"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New Path3"
+            "pathName": "pickUpNote3Blue"
           }
         }
       ]
