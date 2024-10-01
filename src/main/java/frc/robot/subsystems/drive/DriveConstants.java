@@ -29,7 +29,7 @@ public final class DriveConstants {
             Units.inchesToMeters(18.625),
             Units.inchesToMeters(30),
             Units.inchesToMeters(30.75),
-            Units.feetToMeters(15.0), // CHARACTERIZATION GETS THESE 4 (I think)
+            Units.feetToMeters(15.0),
             Units.feetToMeters(75.0),
             12.0,
             6.0);
