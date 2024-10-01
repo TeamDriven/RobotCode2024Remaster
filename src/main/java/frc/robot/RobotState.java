@@ -8,8 +8,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.*;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.*;
+import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -18,11 +20,16 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.swerve.ModuleLimits;
+
+import java.util.NoSuchElementException;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
   public record OdometryObservation(
       SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {}
+
+  public record VisionObservation(Pose2d visionPose, double timestamp) {}
 
   private static final double poseBufferSizeSeconds = 2.0;
 
@@ -79,6 +86,23 @@ public class RobotState {
     // Calculate diff from last odometry pose and add onto pose estimate
     estimatedPose = estimatedPose.exp(twist);
   }
+
+  // The chance of this fully working is low
+  public void addVisionObservation(VisionObservation observation) {
+    // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    try {
+      if (poseBuffer.getInternalBuffer().lastKey() - poseBufferSizeSeconds
+          > observation.timestamp()) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
+      return;
+    }
+    
+    SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions.positions, estimatedPose);
+    estimator.addVisionMeasurement(observation.visionPose, observation.timestamp);
+    estimatedPose = estimator.getEstimatedPosition();
+    }
 
   public void addVelocityData(Twist2d robotVelocity) {
     this.robotVelocity = robotVelocity;
