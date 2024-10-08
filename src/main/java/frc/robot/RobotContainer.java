@@ -133,7 +133,7 @@ public class RobotContainer {
         .run(
             () ->
                 drive.acceptTeleopInput(
-                    -driver.getRightY(), -driver.getRightX(), -driver.getLeftX(), false))
+                    -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
         .withName("Drive Teleop Input");
   }
 
@@ -183,54 +183,6 @@ public class RobotContainer {
                 intake.runVoltageCommand(4),
                 indexer.runIndexerCommand(indexerVelocity, indexerAcceleration)))
         .onFalse(intake.stopIntakeCommand());
-
-    // driver
-    //     .rightTrigger(0.1)
-    //     .onTrue(
-    //         new ShootSequence(
-    //             () -> AngleControllerConstants.subwooferShotAngle,
-    //             () -> ShooterConstants.subwooferShotSpeed,
-    //             AngleControllerConstants.angleRestingPosition,
-    //             () -> SlapperConstants.slapperRestingPosition,
-    //             SlapperConstants.slapperRestingPosition));
-
-    // driver
-    //     .leftTrigger(0.1)
-    //     .onTrue(
-    //         new ShootSequence(
-    //             () -> AngleControllerConstants.podiumShotAngle,
-    //             () -> ShooterConstants.podiumShotSpeed,
-    //             AngleControllerConstants.angleRestingPosition,
-    //             () -> SlapperConstants.slapperRestingPosition,
-    //             SlapperConstants.slapperRestingPosition));
-
-    // driver
-    //     .leftBumper()
-    //     .onTrue(
-    //         new ShootSequence(
-    //             () -> AngleControllerConstants.passShotAngle,
-    //             () -> ShooterConstants.passShotSpeed,
-    //             AngleControllerConstants.angleRestingPosition,
-    //             () -> SlapperConstants.slapperRestingPosition,
-    //             SlapperConstants.slapperRestingPosition));
-
-    // driver
-    //     .pov(270)
-    //     .onTrue(
-    //         new ShootSequence(
-    //             () -> AngleControllerConstants.ampAngle,
-    //             () -> ShooterConstants.ampSpeed,
-    //             AngleControllerConstants.angleRestingPosition,
-    //             () -> SlapperConstants.slapperAmpPosition,
-    //             SlapperConstants.slapperRestingPosition));
-
-    // driver
-    //     .pov(90)
-    //     .onTrue(
-    //         new ParallelDeadlineGroup(
-    //             angleController.setPositionCommandSupplier(() ->
-    // AngleControllerConstants.ampAngle),
-    //             slapper.setPositionCommand(SlapperConstants.slapperAmpPosition)));
 
     // On Stop Shooting
     new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
