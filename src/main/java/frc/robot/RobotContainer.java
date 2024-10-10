@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AngleControllerConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.SlapperConstants;
 import frc.robot.commands.automation.AutoShootSequence;
@@ -49,7 +48,8 @@ import frc.robot.util.Alert.AlertType;
 
 public class RobotContainer {
   private final RobotState robotState = RobotState.getInstance();
-
+  private static boolean isIntaking = false;
+  public static final boolean rightStickDrive = false;
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
 
@@ -129,12 +129,21 @@ public class RobotContainer {
   }
 
   private Command driveCommand() {
-    return drive
-        .run(
-            () ->
-                drive.acceptTeleopInput(
-                    -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
-        .withName("Drive Teleop Input");
+    if (rightStickDrive) {
+      return drive
+          .run(
+              () ->
+                  drive.acceptTeleopInput(
+                      -driver.getRightY(), -driver.getRightX(), -driver.getLeftX(), false))
+          .withName("Drive Teleop Input");
+    } else {
+      return drive
+          .run(
+              () ->
+                  drive.acceptTeleopInput(
+                      -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
+          .withName("Drive Teleop Input");
+    }
   }
 
   /**
@@ -159,10 +168,38 @@ public class RobotContainer {
                                 new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
                 .ignoringDisable(true));
 
-    driver
-        .rightBumper()
-        .whileTrue(new PickUpPiece(IntakeConstants.intakeVoltage))
-        .onFalse(new StopIntake());
+    // driver
+    //     .rightBumper()
+    //     .whileTrue(new PickUpPiece(IntakeConstants.intakeVoltage))
+    //     .onFalse(new StopIntake());
+
+    // driver
+    //     .rightBumper()
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new ParallelCommandGroup(
+    //                 new StopIntake(),
+    //                 new InstantCommand(
+    //                     () -> {
+    //                       isIntaking = false;
+    //                       System.out.println(isIntaking);
+    //                     })),
+    //             new ParallelCommandGroup(
+    //                 new PickUpPiece(intakeVoltage),
+    //                 new InstantCommand(
+    //                     () -> {
+    //                       isIntaking = true;
+    //                       System.out.println(isIntaking);
+    //                     })),
+    //             () -> isIntaking));
+
+    driver.rightBumper().onTrue(new InstantCommand(() -> isIntaking = !isIntaking));
+
+    new Trigger(() -> isIntaking)
+        .onTrue(
+            new PickUpPiece(intakeVoltage).andThen(new InstantCommand(() -> isIntaking = false)));
+
+    new Trigger(() -> !isIntaking).onTrue(new StopIntake());
 
     driver.pov(0).whileTrue(climber.runLimitedVoltageCommand(12));
 
