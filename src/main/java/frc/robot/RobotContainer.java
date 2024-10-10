@@ -45,6 +45,7 @@ import frc.robot.commands.automation.PrepareForShoot;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.StopShoot;
 import frc.robot.commands.drivetrain.AutoTurnToGoal;
+import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -293,7 +294,8 @@ public class RobotContainer {
                     angleRestingPosition,
                     () -> slapperRestingPosition,
                     slapperRestingPosition),
-                new InstantCommand(this::stopShooting)));
+                new InstantCommand(this::stopShooting),
+                new ResetDrive()));
     driver
         .leftBumper()
         .onTrue(
@@ -321,7 +323,8 @@ public class RobotContainer {
                     angleRestingPosition,
                     () -> slapperRestingPosition,
                     slapperRestingPosition),
-                new InstantCommand(this::stopShooting)));
+                new InstantCommand(this::stopShooting),
+                new ResetDrive()));
 
     driver
         .pov(270)
