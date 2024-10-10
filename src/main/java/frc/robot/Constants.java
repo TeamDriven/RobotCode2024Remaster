@@ -160,4 +160,16 @@ public final class Constants {
     public static final double slapperPushNotePosition = 150;
     public static final double slapperPostAmpPosition = 120;
   }
+
+  public final class TurningConstants {
+    public static double championshipShotOffset = 4.5;
+    public static double chainShotOffset = 3;
+    public static double podiumShotOffset = 5;
+    public static double passShotOffset = 5;
+
+    public static double championshipShotManualRot = 151;
+    public static double chainShotManualRot = -180;
+    public static double podiumShotManualRot = 165;
+    public static double passShotManualRot = 160;
+  }
 }
