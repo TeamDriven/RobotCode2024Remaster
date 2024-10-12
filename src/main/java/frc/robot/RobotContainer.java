@@ -8,12 +8,13 @@
 package frc.robot;
 
 import static frc.robot.Constants.*;
-import static frc.robot.Constants.ActuationConstants.*;
 import static frc.robot.Constants.AngleControllerConstants.*;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.*;
+import static frc.robot.Controls.*;
+import static frc.robot.Controls.runIntake;
 import static frc.robot.Subsystems.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +50,6 @@ import frc.robot.util.Alert.AlertType;
 public class RobotContainer {
   private final RobotState robotState = RobotState.getInstance();
   private static boolean isIntaking = false;
-  public static final boolean rightStickDrive = false;
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
 
@@ -129,21 +129,12 @@ public class RobotContainer {
   }
 
   private Command driveCommand() {
-    if (rightStickDrive) {
-      return drive
-          .run(
-              () ->
-                  drive.acceptTeleopInput(
-                      -driver.getRightY(), -driver.getRightX(), -driver.getLeftX(), false))
-          .withName("Drive Teleop Input");
-    } else {
-      return drive
-          .run(
-              () ->
-                  drive.acceptTeleopInput(
-                      -driver.getLeftY(), -driver.getLeftX(), -driver.getRightX(), false))
-          .withName("Drive Teleop Input");
-    }
+    return drive
+        .run(
+            () ->
+                drive.acceptTeleopInput(
+                    driveX.getAsDouble(), driveY.getAsDouble(), driveOmega.getAsDouble(), false))
+        .withName("Drive Teleop Input");
   }
 
   /**
@@ -157,43 +148,16 @@ public class RobotContainer {
     // ------------- Driver Controls -------------
     drive.setDefaultCommand(driveCommand());
 
-    driver
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        robotState.resetPose(
-                            new Pose2d(
-                                // robotState.getEstimatedPose().getTranslation(),
-                                new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
-                .ignoringDisable(true));
+    resetPose.onTrue(
+        Commands.runOnce(
+                () ->
+                    robotState.resetPose(
+                        new Pose2d(
+                            // robotState.getEstimatedPose().getTranslation(),
+                            new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
+            .ignoringDisable(true));
 
-    // driver
-    //     .rightBumper()
-    //     .whileTrue(new PickUpPiece(IntakeConstants.intakeVoltage))
-    //     .onFalse(new StopIntake());
-
-    // driver
-    //     .rightBumper()
-    //     .onTrue(
-    //         new ConditionalCommand(
-    //             new ParallelCommandGroup(
-    //                 new StopIntake(),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       isIntaking = false;
-    //                       System.out.println(isIntaking);
-    //                     })),
-    //             new ParallelCommandGroup(
-    //                 new PickUpPiece(intakeVoltage),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       isIntaking = true;
-    //                       System.out.println(isIntaking);
-    //                     })),
-    //             () -> isIntaking));
-
-    driver.rightBumper().onTrue(new InstantCommand(() -> isIntaking = !isIntaking));
+    runIntake.onTrue(new InstantCommand(() -> isIntaking = !isIntaking));
 
     new Trigger(() -> isIntaking)
         .onTrue(
@@ -201,20 +165,18 @@ public class RobotContainer {
 
     new Trigger(() -> !isIntaking).onTrue(new StopIntake());
 
-    driver.pov(0).whileTrue(climber.runLimitedVoltageCommand(12));
+    climberUp.whileTrue(climber.runLimitedVoltageCommand(12));
 
-    driver.pov(180).whileTrue(climber.runLimitedVoltageCommand(-12));
+    climberDown.whileTrue(climber.runLimitedVoltageCommand(-12));
 
-    driver
-        .b()
+    manualOut
         .whileTrue(
             new ParallelCommandGroup(
                 intake.runVoltageCommand(-4),
                 indexer.runIndexerCommand(-indexerVelocity, indexerAcceleration)))
         .onFalse(intake.stopIntakeCommand());
 
-    driver
-        .x()
+    manualIn
         .whileTrue(
             new ParallelCommandGroup(
                 intake.runVoltageCommand(4),
@@ -228,13 +190,11 @@ public class RobotContainer {
                 AngleControllerConstants.angleRestingPosition,
                 SlapperConstants.slapperRestingPosition));
 
-    driver
-        .rightTrigger(0.1)
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(this::incrementShootingMode),
-                setShootingTypeCommand(shootingType.SUBWOOFER),
-                () -> currentShootingType.equals(shootingType.SUBWOOFER)));
+    subwooferShot.onTrue(
+        new ConditionalCommand(
+            new InstantCommand(this::incrementShootingMode),
+            setShootingTypeCommand(shootingType.SUBWOOFER),
+            () -> currentShootingType.equals(shootingType.SUBWOOFER)));
 
     new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
         .and(() -> currentShootingType.equals(shootingType.SUBWOOFER))
@@ -253,13 +213,11 @@ public class RobotContainer {
                     slapperRestingPosition)
                 .andThen(new InstantCommand(this::stopShooting)));
 
-    driver
-        .leftTrigger(0.1)
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(this::incrementShootingMode),
-                setShootingTypeCommand(shootingType.PODIUM),
-                () -> currentShootingType.equals(shootingType.PODIUM)));
+    podiumShot.onTrue(
+        new ConditionalCommand(
+            new InstantCommand(this::incrementShootingMode),
+            setShootingTypeCommand(shootingType.PODIUM),
+            () -> currentShootingType.equals(shootingType.PODIUM)));
 
     new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
         .and(() -> currentShootingType.equals(shootingType.PODIUM))
@@ -279,13 +237,11 @@ public class RobotContainer {
                     () -> slapperRestingPosition,
                     slapperRestingPosition)
                 .andThen(new InstantCommand(this::stopShooting)));
-    driver
-        .leftBumper()
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(this::incrementShootingMode),
-                setShootingTypeCommand(shootingType.PASS),
-                () -> currentShootingType.equals(shootingType.PASS)));
+    passShot.onTrue(
+        new ConditionalCommand(
+            new InstantCommand(this::incrementShootingMode),
+            setShootingTypeCommand(shootingType.PASS),
+            () -> currentShootingType.equals(shootingType.PASS)));
 
     new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
         .and(() -> currentShootingType.equals(shootingType.PASS))
@@ -306,32 +262,11 @@ public class RobotContainer {
                     slapperRestingPosition)
                 .andThen(new InstantCommand(this::stopShooting)));
 
-    driver
-        .pov(270)
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(this::incrementShootingMode),
-                setShootingTypeCommand(shootingType.AMP),
-                () -> currentShootingType.equals(shootingType.AMP)));
-
-    // new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
-    //     .and(() -> currentShootingType.equals(shootingType.AMP))
-    //     .onTrue(
-    //         new PrepareForShoot(
-    //             () -> AngleControllerConstants.ampAngle,
-    //             () -> ShooterConstants.ampSpeed,
-    //             () -> SlapperConstants.slapperAmpPosition));
-
-    // new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
-    //     .and(() -> currentShootingType.equals(shootingType.AMP))
-    //     .onTrue(
-    //         new AutoShootSequence(
-    //                 () -> ampAngle,
-    //                 () -> ampSpeed,
-    //                 angleRestingPosition,
-    //                 () -> slapperAmpPosition,
-    //                 slapperRestingPosition)
-    //             .andThen(new InstantCommand(this::stopShooting)));
+    ampShot.onTrue(
+        new ConditionalCommand(
+            new InstantCommand(this::incrementShootingMode),
+            setShootingTypeCommand(shootingType.AMP),
+            () -> currentShootingType.equals(shootingType.AMP)));
 
     new Trigger(() -> currentShootingType.equals(shootingType.AMP))
         .and(() -> currentShootingState.equals(shootingState.PREPARED))
@@ -360,7 +295,7 @@ public class RobotContainer {
                             .beforeStarting(
                                 slapper.waitUntilAtPosition(slapperPushNotePosition)))));
 
-    driver.pov(90).onTrue(new InstantCommand(this::stopShooting));
+    cancelShot.onTrue(new InstantCommand(this::stopShooting));
   }
 
   /**
