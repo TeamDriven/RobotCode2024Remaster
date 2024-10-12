@@ -337,7 +337,7 @@ public class RobotContainer {
         .and(() -> currentShootingState.equals(shootingState.PREPARED))
         .onTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
+                new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(270))),
                 angleController.setPositionCommandSupplier(() -> ampAngle),
                 slapper.setPositionCommand(slapperAmpPosition)))
         .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));

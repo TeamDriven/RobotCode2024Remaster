@@ -59,7 +59,7 @@ public final class DriveConstants {
       switch (Constants.getRobot()) {
         case SIMBOT -> 50.0;
         case DEVBOT -> 100.0;
-        case COMPBOT -> 100.0;
+        case COMPBOT -> 50.0;
       };
 
   public static final Matrix<N3, N1> odometryStateStdDevs =
