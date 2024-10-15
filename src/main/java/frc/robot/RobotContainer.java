@@ -15,6 +15,7 @@ import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Controls.runIntake;
+import static frc.robot.Constants.TurningConstants.*;
 import static frc.robot.Subsystems.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,6 +44,8 @@ import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PrepareForShoot;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.StopShoot;
+import frc.robot.commands.drivetrain.AutoTurnToGoal;
+import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -230,18 +233,21 @@ public class RobotContainer {
     new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
         .and(() -> currentShootingType.equals(shootingType.PODIUM))
         .onTrue(
-            new AutoShootSequence(
+            new SequentialCommandGroup(
+                new AutoTurnToGoal(() -> podiumShotOffset),
+                new AutoShootSequence(
                     () -> podiumShotAngle,
                     () -> podiumShotAngle,
                     angleRestingPosition,
                     () -> slapperRestingPosition,
-                    slapperRestingPosition)
-                .andThen(new InstantCommand(this::stopShooting)));
+                    slapperRestingPosition),
+                new InstantCommand(this::stopShooting),
+                new ResetDrive()));
     passShot.onTrue(
-        new ConditionalCommand(
-            new InstantCommand(this::incrementShootingMode),
-            setShootingTypeCommand(shootingType.PASS),
-            () -> currentShootingType.equals(shootingType.PASS)));
+            new ConditionalCommand(
+                new InstantCommand(this::incrementShootingMode),
+                setShootingTypeCommand(shootingType.PASS),
+                () -> currentShootingType.equals(shootingType.PASS)));
 
     new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
         .and(() -> currentShootingType.equals(shootingType.PASS))
@@ -254,13 +260,16 @@ public class RobotContainer {
     new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
         .and(() -> currentShootingType.equals(shootingType.PASS))
         .onTrue(
-            new AutoShootSequence(
+            new SequentialCommandGroup(
+                new AutoTurnToGoal(() -> passShotOffset),
+                new AutoShootSequence(
                     () -> passShotAngle,
                     () -> passShotSpeed,
                     angleRestingPosition,
                     () -> slapperRestingPosition,
-                    slapperRestingPosition)
-                .andThen(new InstantCommand(this::stopShooting)));
+                    slapperRestingPosition),
+                new InstantCommand(this::stopShooting),
+                new ResetDrive()));
 
     ampShot.onTrue(
         new ConditionalCommand(
