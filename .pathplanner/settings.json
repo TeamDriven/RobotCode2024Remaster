@@ -1,9 +1,10 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
+  "robotWidth": 0.62,
+  "robotLength": 0.62,
   "holonomicMode": true,
   "pathFolders": [
-    "New Folder"
+    "Blue",
+    "Red"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

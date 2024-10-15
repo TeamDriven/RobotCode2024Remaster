@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4499707772596704,
-        "y": 4.485250397034318
+        "x": 2.157199863615132,
+        "y": 4.578937089400569
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.110356517436032,
-        "y": 6.358984244364918
+        "x": 1.817585603791494,
+        "y": 6.452670936731169
       },
       "isLocked": false,
-      "linkedName": "note2"
+      "linkedName": "shootNote2Blue"
     },
     {
       "anchor": {
@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.45,
-      "rotationDegrees": 35.68,
+      "rotationDegrees": -144.32,
       "rotateFast": false
     }
   ],
@@ -45,11 +45,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 35.68,
+    "rotation": -135.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "Blue",
   "previewStartingState": {
     "rotation": -43.25999999999999,
     "velocity": 0
