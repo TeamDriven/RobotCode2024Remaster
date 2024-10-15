@@ -3,32 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.0,
-        "y": 2.0
+        "x": 2.157199863615132,
+        "y": 4.578937089400569
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.621581636886527,
-        "y": 2.808047721658924
+        "x": 1.817585603791494,
+        "y": 6.452670936731169
       },
       "isLocked": false,
-      "linkedName": "end2"
+      "linkedName": "shootNote2Blue"
     },
     {
       "anchor": {
-        "x": 6.0,
-        "y": 4.0
+        "x": 2.6022116523588554,
+        "y": 6.792285196558834
       },
       "prevControl": {
-        "x": 6.737782702384235,
-        "y": 4.035132509637344
+        "x": 2.133778190527595,
+        "y": 6.288719225090229
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "start1"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.45,
+      "rotationDegrees": -144.32,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -39,14 +45,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -135.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Blue",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -43.25999999999999,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

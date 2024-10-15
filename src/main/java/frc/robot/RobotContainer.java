@@ -18,6 +18,7 @@ import static frc.robot.Controls.*;
 import static frc.robot.Controls.runIntake;
 import static frc.robot.Subsystems.*;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -41,9 +43,11 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.SlapperConstants;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
+import frc.robot.commands.automation.PickUpPieceAuto;
 import frc.robot.commands.automation.PrepareForShoot;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.StopShoot;
+import frc.robot.commands.automation.ZeroAngle;
 import frc.robot.commands.drivetrain.AutoTurnToGoal;
 import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.drive.*;
@@ -72,6 +76,8 @@ public class RobotContainer {
   };
 
   private static shootingType currentShootingType = shootingType.SUBWOOFER;
+
+  private static SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   // Dashboard inputs
   // private final AutoSelector autoSelector = new AutoSelector("Auto");
@@ -123,7 +129,14 @@ public class RobotContainer {
     }
 
     // Configure autos and buttons
+    linkAutoCommands();
     configureButtonBindings(false);
+
+    autoChooser.setDefaultOption("Do nothing", new SequentialCommandGroup());
+    autoChooser.addOption("Blue 4 piece", drive.getAutoPath("close 4 blue"));
+    autoChooser.addOption("Red 4 piece", drive.getAutoPath("close 4 red"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // Alerts for constants
     if (Constants.tuningMode) {
@@ -138,6 +151,58 @@ public class RobotContainer {
                 drive.acceptTeleopInput(
                     driveX.getAsDouble(), driveY.getAsDouble(), driveOmega.getAsDouble(), false))
         .withName("Drive Teleop Input");
+  }
+
+  private void linkAutoCommands() {
+    NamedCommands.registerCommand("zeroShooter", new ZeroAngle());
+
+    NamedCommands.registerCommand(
+        "stopDrive", new InstantCommand(() -> drive.clearAutoInput(), drive));
+
+    NamedCommands.registerCommand(
+        "shoot1CloseBlue",
+        new AutoShootSequence(
+            () -> -1.0, () -> 40, 17.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot2CloseBlue",
+        new AutoShootSequence(
+            () -> 17.5, () -> 45, 18.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot3CloseBlue",
+        new AutoShootSequence(
+            () -> 18.5, () -> 45, 19.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot4CloseBlue",
+        new AutoShootSequence(
+            () -> 19.5,
+            () -> 45,
+            angleRestingPosition,
+            () -> slapperRestingPosition,
+            slapperRestingPosition));
+
+    NamedCommands.registerCommand(
+        "shoot1CloseRed",
+        new AutoShootSequence(
+            () -> -1.0, () -> 40, 17.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot2CloseRed",
+        new AutoShootSequence(
+            () -> 17.5, () -> 45, 18.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot3CloseRed",
+        new AutoShootSequence(
+            () -> 18.5, () -> 45, 19.5, () -> slapperRestingPosition, slapperRestingPosition));
+    NamedCommands.registerCommand(
+        "shoot4CloseRed",
+        new AutoShootSequence(
+            () -> 19.5,
+            () -> 45,
+            angleRestingPosition,
+            () -> slapperRestingPosition,
+            slapperRestingPosition));
+
+    NamedCommands.registerCommand("intake", new PickUpPieceAuto(autoIntakeVoltage));
+    NamedCommands.registerCommand("stopIntake", new StopIntake());
   }
 
   /**
@@ -393,6 +458,7 @@ public class RobotContainer {
     //         new WheelRadiusCharacterization(
     //             drive, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE))
     //     .withName("Drive Wheel Radius Characterization");
-    return drive.getAutoPath("New Auto");
+    // return drive.getAutoPath("close 4 blue");
+    return autoChooser.getSelected();
   }
 }

@@ -399,6 +399,10 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  public void clearAutoInput() {
+    autoDriveController.acceptDriveInput(new ChassisSpeeds());
+  }
+
   /** Sets the goal pose for the robot to drive to */
   public void setAutoAlignGoal(
       Supplier<Pose2d> poseSupplier,
