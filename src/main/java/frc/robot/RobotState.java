@@ -19,10 +19,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.swerve.ModuleLimits;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
   public record OdometryObservation(
       SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {}
+
+  public record VisionObservation(Pose2d visionPose, double timestamp) {}
 
   private static final double poseBufferSizeSeconds = 2.0;
 
@@ -78,6 +81,15 @@ public class RobotState {
     poseBuffer.addSample(observation.timestamp(), odometryPose);
     // Calculate diff from last odometry pose and add onto pose estimate
     estimatedPose = estimatedPose.exp(twist);
+  }
+
+  // The chance of this fully working is low
+  public void addVisionObservation(VisionObservation observation) {
+    // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    Logger.recordOutput("Limelight/SentPose", observation.visionPose);
+
+    estimatedPose =
+        new Pose2d(observation.visionPose.getTranslation(), estimatedPose.getRotation());
   }
 
   public void addVelocityData(Twist2d robotVelocity) {
