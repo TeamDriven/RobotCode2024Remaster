@@ -59,7 +59,7 @@ public final class DriveConstants {
       switch (Constants.getRobot()) {
         case SIMBOT -> 50.0;
         case DEVBOT -> 100.0;
-        case COMPBOT -> 50.0;
+        case COMPBOT -> 150.0;
       };
 
   public static final Matrix<N3, N1> odometryStateStdDevs =
@@ -71,10 +71,10 @@ public final class DriveConstants {
   public static final ModuleConfig[] moduleConfigs =
       switch (Constants.getRobot()) {
         case COMPBOT -> new ModuleConfig[] {
-          new ModuleConfig(1, 2, 3, new Rotation2d(0.011), true),
-          new ModuleConfig(4, 5, 6, new Rotation2d(-3.140), true),
-          new ModuleConfig(7, 8, 9, new Rotation2d(0.021), true),
-          new ModuleConfig(10, 11, 12, new Rotation2d(3.128), true)
+          new ModuleConfig(1, 2, 3, new Rotation2d(-0.014), true),
+          new ModuleConfig(4, 5, 6, new Rotation2d(-0.015 - Math.PI), true),
+          new ModuleConfig(7, 8, 9, new Rotation2d(0.084), true),
+          new ModuleConfig(10, 11, 12, new Rotation2d(-6.285 - Math.PI), true)
         };
         case DEVBOT -> new ModuleConfig[] {
           new ModuleConfig(1, 2, 3, new Rotation2d(0), true),

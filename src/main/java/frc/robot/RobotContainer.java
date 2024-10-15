@@ -13,9 +13,9 @@ import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.*;
+import static frc.robot.Constants.TurningConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Controls.runIntake;
-import static frc.robot.Constants.TurningConstants.*;
 import static frc.robot.Subsystems.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -244,10 +244,10 @@ public class RobotContainer {
                 new InstantCommand(this::stopShooting),
                 new ResetDrive()));
     passShot.onTrue(
-            new ConditionalCommand(
-                new InstantCommand(this::incrementShootingMode),
-                setShootingTypeCommand(shootingType.PASS),
-                () -> currentShootingType.equals(shootingType.PASS)));
+        new ConditionalCommand(
+            new InstantCommand(this::incrementShootingMode),
+            setShootingTypeCommand(shootingType.PASS),
+            () -> currentShootingType.equals(shootingType.PASS)));
 
     new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
         .and(() -> currentShootingType.equals(shootingType.PASS))
@@ -281,7 +281,7 @@ public class RobotContainer {
         .and(() -> currentShootingState.equals(shootingState.PREPARED))
         .onTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(270))),
+                new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
                 angleController.setPositionCommandSupplier(() -> ampAngle),
                 slapper.setPositionCommand(slapperAmpPosition)))
         .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));

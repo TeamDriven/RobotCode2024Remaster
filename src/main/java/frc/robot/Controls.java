@@ -10,9 +10,9 @@ public class Controls {
 
   // Drivetrain
   public static DoubleSupplier driveX =
-      () -> rightStickDrive ? -driver.getRightX() : -driver.getLeftX();
-  public static DoubleSupplier driveY =
       () -> rightStickDrive ? -driver.getRightY() : -driver.getLeftY();
+  public static DoubleSupplier driveY =
+      () -> rightStickDrive ? -driver.getRightX() : -driver.getLeftX();
   public static DoubleSupplier driveOmega =
       () -> rightStickDrive ? -driver.getLeftX() : -driver.getRightX();
   public static Trigger resetPose = driver.start();
