@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -23,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * The Intake class represents the intake subsystem of the robot. It controls the intake motor and
  * provides methods to run the motor at different velocities and voltages.
  */
-@AutoLog
 public class Intake extends SubsystemBase {
   private TalonFX intakeMotor = new TalonFX(13);
 

@@ -18,12 +18,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 /** The Slapper subsystem controls the slapper motor, which is used to keep the note in the amp */
-@AutoLog
 public class Slapper extends SubsystemBase {
   private TalonFX slapperMotor = new TalonFX(20);
   private DutyCycleEncoder throughboreEncoder = new DutyCycleEncoder(5);

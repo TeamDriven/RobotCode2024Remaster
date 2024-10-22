@@ -14,12 +14,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 /** The AngleController class represents a subsystem that controls the angle of the shooter. */
-@AutoLog
 public class AngleController extends SubsystemBase {
   // private PowerDistribution pdp = new PowerDistribution(30, ModuleType.kRev);
   private TalonFX angleMotor = new TalonFX(19);
