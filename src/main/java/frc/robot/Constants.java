@@ -89,7 +89,7 @@ public final class Constants {
     public static double actuationPickUpPosition = 98; // 100
     public static final double actuationTuckPosition = -63.3;
 
-    public static final double actuationOffset = 1.5 - actuationStartPosition;
+    public static final double actuationOffset = 1.9 - actuationStartPosition;
   }
 
   public final class IntakeConstants {
@@ -123,7 +123,7 @@ public final class Constants {
     public static final double trapAngle = 0;
     public static double ampAngle = 0;
 
-    public static double subwooferShotAngle = -1.0;
+    public static double subwooferShotAngle = -1.25;
     public static double podiumShotAngle = 23.0; // 23 Half Line Shot 34.75
     public static double chainShotAngle = 33.25;
     public static double championshipShotAngle = 33;
@@ -136,7 +136,7 @@ public final class Constants {
     public static final double trapSpeed = 36;
     public static double ampSpeed = 8.5;
 
-    public static double subwooferShotSpeed = 40; // 27
+    public static double subwooferShotSpeed = 45; // 27
     public static double podiumShotSpeed = 44; // 55 Half Line Shot 62
     public static double chainShotSpeed = 54; // 44
     public static double championshipShotSpeed = 52;
@@ -149,7 +149,7 @@ public final class Constants {
   }
 
   public final class SlapperConstants {
-    public static final double slapperOffset = 96.1 + 4 - 0.4;
+    public static final double slapperOffset = 99.941;
 
     public static final double slapperGearRatio = 2.25;
     public static final double slapperTicksPerDegree = (1.0 / 360.0);

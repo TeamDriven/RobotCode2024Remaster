@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import static frc.robot.Subsystems.limelightShooter;
+// import static frc.robot.Subsystems.limelightShooter;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.automation.ZeroAngle;
-import frc.robot.commands.limelight.SeedPoseEstimation;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.VirtualSubsystem;
@@ -231,7 +230,7 @@ public class Robot extends LoggedRobot {
     }
 
     new ZeroAngle().schedule();
-    limelightShooter.setDefaultCommand(new SeedPoseEstimation());
+    // limelightShooter.setDefaultCommand(new SeedPoseEstimation());
 
     teleStart = Timer.getFPGATimestamp();
   }

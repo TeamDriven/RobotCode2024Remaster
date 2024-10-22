@@ -15,11 +15,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.AutoLog;
+
 /**
  * The Indexer class represents a subsystem that controls the indexer motor. It provides methods to
  * initialize, run, and stop the indexer motor, as well as check its speed and create commands to
  * control it.
  */
+@AutoLog
 public class Indexer extends SubsystemBase {
   private TalonFX indexerMotor = new TalonFX(17);
 

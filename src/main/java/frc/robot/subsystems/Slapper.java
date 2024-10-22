@@ -14,13 +14,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
+
 /** The Slapper subsystem controls the slapper motor, which is used to keep the note in the amp */
+@AutoLog
 public class Slapper extends SubsystemBase {
   private TalonFX slapperMotor = new TalonFX(20);
   private DutyCycleEncoder throughboreEncoder = new DutyCycleEncoder(5);
@@ -95,6 +98,21 @@ public class Slapper extends SubsystemBase {
     }
 
     configs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+  }
+
+  public Command runVoltageCommand(double speed) {
+    return new Command() {
+      @Override
+      public void execute() {
+        slapperMotor.set(speed);
+        isPositionControl = false;
+      }
+
+      @Override
+      public void end(boolean isInterrupted) {
+        slapperMotor.set(0);
+      }
+    };
   }
 
   /**
@@ -214,8 +232,10 @@ public class Slapper extends SubsystemBase {
     if (isPositionControl) {
       runMotorToPosition();
     }
-    SmartDashboard.putNumber("Slapper pos", getPosition());
-    SmartDashboard.putNumber("Desired Slapper pos", desiredPos);
-    SmartDashboard.putNumber("Encoder", throughboreEncoder.getAbsolutePosition());
+    // SmartDashboard.putNumber("Slapper pos", getPosition());
+    // SmartDashboard.putNumber("Desired Slapper pos", desiredPos);
+    // SmartDashboard.putNumber("Encoder", throughboreEncoder.getAbsolutePosition());
+    Logger.recordOutput("Slapper/SlapperPos", getPosition());
+    Logger.recordOutput("Slapper/EncoderPos", throughboreEncoder.getAbsolutePosition());
   }
 }

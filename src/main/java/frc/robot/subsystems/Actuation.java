@@ -21,12 +21,15 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 /**
  * The Actuation subsystem controls the actuation motor that moves a mechanism to a specific
  * position.
  */
+@AutoLog
 public class Actuation extends SubsystemBase {
   private TalonFX actuationMotor = new TalonFX(14);
 

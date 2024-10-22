@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -24,6 +26,7 @@ import org.littletonrobotics.junction.Logger;
  * handles the initialization of motors, running the shooter at a given velocity and acceleration,
  * and stopping the shooter.
  */
+@AutoLog
 public class Shooter extends SubsystemBase {
   // Distance, Angle, Speed
   private static final Double[][] distanceMap = {

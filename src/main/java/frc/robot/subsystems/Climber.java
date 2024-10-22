@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ClimberConstants.*;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * provides methods to control the climber motor, set the position of the climber, and run the
  * climber at a specified voltage.
  */
+@AutoLog
 public class Climber extends SubsystemBase {
   private TalonFX climberMotor = new TalonFX(18);
 
