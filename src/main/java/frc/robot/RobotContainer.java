@@ -441,7 +441,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     // Drive Static
-    // Characterizationy0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    // Characterization
     // return new StaticCharacterization(
     //         drive, drive::runCharacterization, drive::getCharacterizationVelocity)
     //     .finallyDo(drive::endCharacterization);
