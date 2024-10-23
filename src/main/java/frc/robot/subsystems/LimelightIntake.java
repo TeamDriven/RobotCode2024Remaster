@@ -248,9 +248,4 @@ public class LimelightIntake extends SubsystemBase {
     // System.out.println("Distance: " + getDistanceFromGoal());
     // System.out.println("TX: " + getTX());
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
 }

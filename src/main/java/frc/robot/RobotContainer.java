@@ -48,7 +48,7 @@ import frc.robot.commands.automation.PrepareForShoot;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.StopShoot;
 import frc.robot.commands.automation.ZeroAngle;
-import frc.robot.commands.drivetrain.AutoTurnToGoal;
+// import frc.robot.commands.drivetrain.AutoTurnToGoal;
 import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
@@ -132,9 +132,21 @@ public class RobotContainer {
     linkAutoCommands();
     configureButtonBindings(false);
 
-    autoChooser.setDefaultOption("Do nothing", new SequentialCommandGroup());
+    autoChooser.setDefaultOption(
+        "Do nothing",
+        (Commands.runOnce(
+                () ->
+                    robotState.resetPose(
+                        new Pose2d(
+                            // robotState.getEstimatedPose().getTranslation(),
+                            new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
+            .ignoringDisable(true)));
     autoChooser.addOption("Blue 4 piece", drive.getAutoPath("close 4 blue"));
     autoChooser.addOption("Red 4 piece", drive.getAutoPath("close 4 red"));
+    autoChooser.addOption("Blue Mobility", drive.getAutoPath("blue mobility"));
+    autoChooser.addOption("Red Mobility", drive.getAutoPath("red mobility"));
+    autoChooser.addOption("Red Shoot 1", drive.getAutoPath("shoot 1 red"));
+    autoChooser.addOption("Blue Shoot 1", drive.getAutoPath("shoot 1 blue"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -162,7 +174,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "shoot1CloseBlue",
         new AutoShootSequence(
-            () -> -1.0, () -> 40, 17.5, () -> slapperRestingPosition, slapperRestingPosition));
+            () -> -1.25, () -> 45, 17.5, () -> slapperRestingPosition, slapperRestingPosition));
     NamedCommands.registerCommand(
         "shoot2CloseBlue",
         new AutoShootSequence(
@@ -225,6 +237,8 @@ public class RobotContainer {
                             new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
             .ignoringDisable(true));
 
+    // runIntake.onTrue(new PickUpPiece(intakeVoltage)).onFalse(new StopIntake());
+
     runIntake.onTrue(new InstantCommand(() -> isIntaking = !isIntaking));
 
     new Trigger(() -> isIntaking)
@@ -236,6 +250,9 @@ public class RobotContainer {
     climberUp.whileTrue(climber.runLimitedVoltageCommand(12));
 
     climberDown.whileTrue(climber.runLimitedVoltageCommand(-12));
+
+    // driver.y().whileTrue(slapper.runVoltageCommand(-0.1));
+    // driver.a().whileTrue(slapper.runVoltageCommand(0.1));
 
     manualOut
         .whileTrue(
@@ -299,7 +316,7 @@ public class RobotContainer {
         .and(() -> currentShootingType.equals(shootingType.PODIUM))
         .onTrue(
             new SequentialCommandGroup(
-                new AutoTurnToGoal(() -> podiumShotOffset),
+                // new AutoTurnToGoal(() -> podiumShotOffset), sorry they no want auto turn
                 new AutoShootSequence(
                     () -> podiumShotAngle,
                     () -> podiumShotAngle,
@@ -326,7 +343,7 @@ public class RobotContainer {
         .and(() -> currentShootingType.equals(shootingType.PASS))
         .onTrue(
             new SequentialCommandGroup(
-                new AutoTurnToGoal(() -> passShotOffset),
+                // new AutoTurnToGoal(() -> passShotOffset),
                 new AutoShootSequence(
                     () -> passShotAngle,
                     () -> passShotSpeed,

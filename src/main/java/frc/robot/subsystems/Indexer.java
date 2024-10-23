@@ -201,9 +201,4 @@ public class Indexer extends SubsystemBase {
     // System.out.println("Indexer Speed: " + indexerMotor.getVelocity());
     // SmartDashboard.putNumber("Indexer Speed", indexerMotor.getVelocity().getValueAsDouble());
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
 }

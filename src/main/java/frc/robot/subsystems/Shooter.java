@@ -556,9 +556,4 @@ public class Shooter extends SubsystemBase {
     // SmartDashboard.putNumber("RPos", rightShooterMotor.getPosition().getValueAsDouble());
     // SmartDashboard.putNumber("RVel", rightShooterMotor.getVelocity().getValueAsDouble());
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
 }
