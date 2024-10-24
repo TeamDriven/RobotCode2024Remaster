@@ -1,6 +1,5 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
@@ -66,7 +65,7 @@ public class ShootSequence extends ConditionalCommand {
             indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
             shooter.checkIfAtSpeedSupplier(velocity),
             indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-            actuation.waitUntilAtPosition(actuationTuckPosition),
+            actuation.waitUntilAtPosition(),
             intake.startFeedingCommand(feedVelocity, feedAcceleration),
             new WaitCommand(1.0),
             new StopShoot(restingAngle, slapperRestingPosition)),
@@ -93,7 +92,7 @@ public class ShootSequence extends ConditionalCommand {
             indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
             shooter.checkIfAtSpeedSupplier(velocity),
             indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-            actuation.waitUntilAtPosition(actuationTuckPosition),
+            actuation.waitUntilAtPosition(),
             intake.startFeedingCommand(feedVelocity, feedAcceleration),
             new WaitCommand(1.0),
             // shooter.waitUntilRingLeft(),

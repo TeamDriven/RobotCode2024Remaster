@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.Actuation;
 import frc.robot.subsystems.AngleController;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Indexer;
@@ -13,6 +12,7 @@ import frc.robot.subsystems.LimelightIntake;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Slapper;
+import frc.robot.subsystems.actuation.Actuation;
 import frc.robot.subsystems.drive.Drive;
 
 /**
@@ -21,7 +21,7 @@ import frc.robot.subsystems.drive.Drive;
  */
 public final class Subsystems {
   public static final Intake intake = new Intake(); // My intake
-  public static final Actuation actuation = new Actuation(); // My actuation
+  public static Actuation actuation = null; // My actuation
   public static final Shooter shooter = new Shooter(); // My shooter
   public static final Indexer indexer = new Indexer(); // My indexer
   public static final Climber climber = new Climber(); // My climber

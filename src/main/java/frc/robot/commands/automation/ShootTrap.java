@@ -1,6 +1,5 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
 import static frc.robot.Constants.AngleControllerConstants.angleRestingPosition;
 import static frc.robot.Constants.AngleControllerConstants.trapAngle;
 import static frc.robot.Constants.IndexerConstants.*;
@@ -28,7 +27,7 @@ public class ShootTrap extends SequentialCommandGroup {
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(() -> trapSpeed),
         indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-        actuation.waitUntilAtPosition(actuationTuckPosition),
+        actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         new StopShoot(angleRestingPosition, slapperRestingPosition));

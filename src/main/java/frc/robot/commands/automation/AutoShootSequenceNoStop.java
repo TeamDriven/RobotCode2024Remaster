@@ -1,13 +1,14 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.actuation.Actuation.position;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -35,11 +36,11 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-        actuation.waitUntilAtPosition(actuationTuckPosition),
+        actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         intake.stopIntakeCommand(),
-        actuation.setPositionCommand(restingAngle));
+        new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 
   public AutoShootSequenceNoStop(
@@ -57,10 +58,10 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-        actuation.waitUntilAtPosition(actuationTuckPosition),
+        actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         intake.stopIntakeCommand(),
-        actuation.setPositionCommand(restingAngle));
+        new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 }

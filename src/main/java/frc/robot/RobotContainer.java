@@ -13,9 +13,7 @@ import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.*;
-import static frc.robot.Constants.TurningConstants.*;
 import static frc.robot.Controls.*;
-import static frc.robot.Controls.runIntake;
 import static frc.robot.Subsystems.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -50,6 +48,8 @@ import frc.robot.commands.automation.StopShoot;
 import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
 import frc.robot.commands.drivetrain.ResetDrive;
+import frc.robot.subsystems.actuation.Actuation;
+import frc.robot.subsystems.actuation.ActuationIOFalcon500;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -95,6 +95,7 @@ public class RobotContainer {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
+          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
         }
         case DEVBOT -> {
           drive =
@@ -104,15 +105,10 @@ public class RobotContainer {
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
+          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
         }
         case SIMBOT -> {
-          drive =
-              new Drive(
-                  new GyroIO() {},
-                  new ModuleIOSim(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[3]));
+          throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
         }
       }
     }

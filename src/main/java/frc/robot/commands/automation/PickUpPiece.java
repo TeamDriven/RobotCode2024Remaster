@@ -1,10 +1,11 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
 import static frc.robot.Subsystems.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.ShakeController;
+import frc.robot.subsystems.actuation.Actuation.position;
 
 /**
  * A command group that represents the process of picking up a piece. This command group
@@ -18,12 +19,12 @@ public class PickUpPiece extends SequentialCommandGroup {
 
   public PickUpPiece(double voltage) {
     addCommands(
-        actuation.setPositionCommand(actuationPickUpPosition),
-        actuation.waitUntilAtPosition(actuationPickUpPosition),
+        new InstantCommand(() -> actuation.setPosition(position.PICK_UP)),
+        actuation.waitUntilAtPosition(),
         intake.runVoltageCommand(voltage),
         intake.waitUntilTripped(),
         intake.stopIntakeCommand(),
-        actuation.setPositionCommand(actuationTuckPosition),
+        new InstantCommand(() -> actuation.setPosition(position.TUCK)),
         new ShakeController(1.0, 1.0));
   }
 }
