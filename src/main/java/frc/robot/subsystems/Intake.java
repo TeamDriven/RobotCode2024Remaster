@@ -317,9 +317,4 @@ public class Intake extends SubsystemBase {
 
     // SmartDashboard.putNumber("Intake Speed", intakeMotor.getVelocity().getValueAsDouble());
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
 }

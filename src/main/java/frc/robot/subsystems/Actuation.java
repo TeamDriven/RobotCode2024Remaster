@@ -292,9 +292,4 @@ public class Actuation extends SubsystemBase {
         "Actuation Angle",
         actuationMotor.getPosition().getValueAsDouble() / actuationInternalTicksPerDegree);
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
 }
