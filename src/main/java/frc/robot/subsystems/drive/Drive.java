@@ -7,6 +7,13 @@
 
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.drive.controllers.AutoAlignController;
+import frc.robot.subsystems.drive.controllers.AutoDriveController;
 import frc.robot.subsystems.drive.controllers.HeadingController;
 import frc.robot.subsystems.drive.controllers.TeleopDriveController;
 import frc.robot.util.EqualsUtil;
@@ -45,6 +53,9 @@ public class Drive extends SubsystemBase {
   public enum DriveMode {
     /** Driving with input from driver joysticks. (Default) */
     TELEOP,
+
+    /** Driving with chassis speeds from pathplanner in auto */
+    AUTO,
 
     /** Driving to a location on the field automatically. */
     AUTO_ALIGN,
@@ -109,6 +120,7 @@ public class Drive extends SubsystemBase {
   private final SwerveSetpointGenerator setpointGenerator;
 
   private final TeleopDriveController teleopDriveController;
+  private final AutoDriveController autoDriveController;
   private AutoAlignController autoAlignController = null;
   private HeadingController headingController = null;
 
@@ -124,6 +136,9 @@ public class Drive extends SubsystemBase {
     setpointGenerator =
         new SwerveSetpointGenerator(DriveConstants.kinematics, DriveConstants.moduleTranslations);
     teleopDriveController = new TeleopDriveController();
+    autoDriveController = new AutoDriveController();
+
+    configurePathPlanner();
   }
 
   public void periodic() {
@@ -254,6 +269,10 @@ public class Drive extends SubsystemBase {
           desiredSpeeds.omegaRadiansPerSecond = headingController.update();
         }
       }
+      case AUTO -> {
+        // Run auto drive with drive input
+        desiredSpeeds = autoDriveController.getChassisSpeeds();
+      }
       case AUTO_ALIGN -> {
         // Run auto align with drive input
         desiredSpeeds = autoAlignController.update();
@@ -302,6 +321,64 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("Drive/DriveMode", currentDriveMode);
   }
 
+  /** Configure the path planner for the swerve drivetrain */
+  private void configurePathPlanner() {
+    AutoBuilder.configureHolonomic(
+        () -> RobotState.getInstance().getEstimatedPose(), // Supplier of current robot pose
+        (pose2D) ->
+            RobotState.getInstance().resetPose(pose2D), // Consumer for seeding pose against auto
+        () -> autoDriveController.getChassisSpeeds(), // Supplier of ChassisSpeeds for the robot
+        (speeds) -> acceptAutoInput(speeds), // Consumer of ChassisSpeeds to drive the robot
+        getPathFollowerConfig(),
+        () -> false,
+        this); // Subsystem for requirements
+  }
+
+  public HolonomicPathFollowerConfig getPathFollowerConfig() {
+    return new HolonomicPathFollowerConfig(
+        new PIDConstants(2, 0, 0),
+        new PIDConstants(2, 0, 0),
+        DriveConstants.moduleLimitsFree.maxDriveVelocity(),
+        DriveConstants.driveConfig.driveBaseRadius(),
+        new ReplanningConfig());
+  }
+
+  /**
+   * Get an auto based off of the name
+   *
+   * @param pathName the name of the path
+   * @return a command that will run the path
+   */
+  public Command getAutoPath(String pathName) {
+    return new PathPlannerAuto(pathName);
+  }
+
+  /**
+   * Get the end state of a path
+   *
+   * @param autoName the name of the auto to grab from
+   * @param index the index of the path in that auto
+   * @return the end state of the path
+   */
+  public State getEndPath(String autoName, int index) {
+    var pathGroup = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+    var path = pathGroup.get(index);
+
+    ChassisSpeeds startingChassisSpeed = new ChassisSpeeds(0, 0, 0);
+    Rotation2d rot;
+
+    try {
+      var previousPath = pathGroup.get(index - 1);
+      var startingState = previousPath.getGoalEndState();
+      rot = startingState.getRotation();
+    } catch (IndexOutOfBoundsException e) {
+      rot = RobotState.getInstance().getEstimatedPose().getRotation();
+    }
+
+    var trajectory = new PathPlannerTrajectory(path, startingChassisSpeed, rot);
+    return trajectory.getEndState();
+  }
+
   /** Pass controller input into teleopDriveController in field relative input */
   public void acceptTeleopInput(
       double controllerX, double controllerY, double controllerOmega, boolean robotRelative) {
@@ -312,6 +389,18 @@ public class Drive extends SubsystemBase {
       teleopDriveController.acceptDriveInput(
           controllerX, controllerY, controllerOmega, robotRelative);
     }
+  }
+
+  /** Pass ChassisSpeeds input into autoDriveController in field relative input */
+  public void acceptAutoInput(ChassisSpeeds chassisSpeeds) {
+    if (DriverStation.isAutonomousEnabled()) {
+      currentDriveMode = DriveMode.AUTO;
+      autoDriveController.acceptDriveInput(chassisSpeeds);
+    }
+  }
+
+  public void clearAutoInput() {
+    autoDriveController.acceptDriveInput(new ChassisSpeeds());
   }
 
   /** Sets the goal pose for the robot to drive to */
