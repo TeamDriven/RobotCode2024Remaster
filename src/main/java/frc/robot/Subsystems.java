@@ -13,7 +13,15 @@ import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Slapper;
 import frc.robot.subsystems.actuation.Actuation;
+import frc.robot.subsystems.actuation.ActuationIO;
+import frc.robot.subsystems.actuation.ActuationIOFalcon500;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOKrakenFOC;
+import frc.robot.subsystems.drive.ModuleIOSparkMax;
 
 /**
  * The Subsystems class represents the collection of subsystems used in the robot. It provides
@@ -21,7 +29,6 @@ import frc.robot.subsystems.drive.Drive;
  */
 public final class Subsystems {
   public static final Intake intake = new Intake(); // My intake
-  public static Actuation actuation = null; // My actuation
   public static final Shooter shooter = new Shooter(); // My shooter
   public static final Indexer indexer = new Indexer(); // My indexer
   public static final Climber climber = new Climber(); // My climber
@@ -33,5 +40,49 @@ public final class Subsystems {
       new LimelightIntake(); // My limelight for the intake
   public static final Slapper slapper = new Slapper(); // My slapper
 
-  public static Drive drive = null;
+  public static final Drive drive;
+  public static final Actuation actuation; // My actuation
+
+  static {
+    // Create subsystems
+    if (Constants.getMode() != Constants.Mode.REPLAY) {
+      switch (Constants.getRobot()) {
+        case COMPBOT -> {
+          drive =
+              new Drive(
+                  new GyroIOPigeon2(true),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
+          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
+        }
+        case DEVBOT -> {
+          drive =
+              new Drive(
+                  new GyroIOPigeon2(false),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
+          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
+        }
+        case SIMBOT -> {
+          throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
+        }
+        default -> {
+          throw new IllegalStateException("Robot type not selected");
+        }
+      }
+    } else {
+      drive =
+          new Drive(
+              new GyroIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {},
+              new ModuleIO() {});
+      actuation = new Actuation(new ActuationIO() {});
+    }
+  }
 }

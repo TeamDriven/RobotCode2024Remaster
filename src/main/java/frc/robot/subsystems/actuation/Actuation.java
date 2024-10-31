@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The Actuation subsystem controls the actuation motor that moves a mechanism to a specific
@@ -49,6 +50,7 @@ public class Actuation extends SubsystemBase {
   @Override
   public void periodic() {
     actuationIO.updateInputs(actuationInputs);
+    Logger.processInputs("Actuation", actuationInputs);
 
     switch (currentPosition) {
       case MANUAL:

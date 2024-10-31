@@ -48,8 +48,6 @@ import frc.robot.commands.automation.StopShoot;
 import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
 import frc.robot.commands.drivetrain.ResetDrive;
-import frc.robot.subsystems.actuation.Actuation;
-import frc.robot.subsystems.actuation.ActuationIOFalcon500;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -84,46 +82,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Create subsystems
-    if (Constants.getMode() != Constants.Mode.REPLAY) {
-      switch (Constants.getRobot()) {
-        case COMPBOT -> {
-          drive =
-              new Drive(
-                  new GyroIOPigeon2(true),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
-          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
-        }
-        case DEVBOT -> {
-          drive =
-              new Drive(
-                  new GyroIOPigeon2(false),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
-          actuation = new Actuation(new ActuationIOFalcon500(14, 6));
-        }
-        case SIMBOT -> {
-          throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
-        }
-      }
-    }
-
-    // No-op implementation for replay
-    if (drive == null) {
-      drive =
-          new Drive(
-              new GyroIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {});
-    }
-
     // Configure autos and buttons
     linkAutoCommands();
     configureButtonBindings(false);
