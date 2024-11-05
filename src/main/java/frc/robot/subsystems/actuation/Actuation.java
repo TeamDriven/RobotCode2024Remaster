@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -34,6 +35,7 @@ public class Actuation extends SubsystemBase {
     }
   }
 
+  @AutoLogOutput(key = "Actuation/currentPosition")
   private position currentPosition = position.START;
 
   private double manualVoltage = 0;
@@ -51,6 +53,9 @@ public class Actuation extends SubsystemBase {
   public void periodic() {
     actuationIO.updateInputs(actuationInputs);
     Logger.processInputs("Actuation", actuationInputs);
+
+    Logger.recordOutput("Actuation/motorAngle", actuationInputs.motorAngle);
+    Logger.recordOutput("Actuation/encoderAngle", actuationInputs.encoderAngle);
 
     switch (currentPosition) {
       case MANUAL:
