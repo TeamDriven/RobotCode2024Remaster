@@ -5,7 +5,6 @@
 package frc.robot;
 
 import frc.robot.subsystems.AngleController;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightIntake;
@@ -15,6 +14,7 @@ import frc.robot.subsystems.Slapper;
 import frc.robot.subsystems.actuation.Actuation;
 import frc.robot.subsystems.actuation.ActuationIO;
 import frc.robot.subsystems.actuation.ActuationIOFalcon500;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;

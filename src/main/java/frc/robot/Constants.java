@@ -127,11 +127,6 @@ public final class Constants {
     public static double passShotSpeed = 42.5; // 30
   }
 
-  public final class ClimberConstants {
-    public static final double minClimberHeight = 0;
-    public static final double maxClimberHeight = 240;
-  }
-
   public final class SlapperConstants {
     public static final double slapperOffset = 99.941;
 

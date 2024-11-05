@@ -1,12 +1,10 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.climber;
 
-import static frc.robot.Constants.ClimberConstants.*;
+import static frc.robot.subsystems.climber.ClimberConstants.*;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -23,19 +21,12 @@ public class Climber extends SubsystemBase {
   private TalonFX climberMotor = new TalonFX(18);
 
   private VoltageOut voltageControl;
-  private MotionMagicVoltage motionMagicControl;
-  private VelocityVoltage velocityControl;
   private NeutralOut StopMode;
 
   public Climber() {
     initClimberMotor();
 
     voltageControl = new VoltageOut(0.0, true, false, false, false);
-
-    motionMagicControl = new MotionMagicVoltage(0, true, 0.03, 0, false, false, false);
-
-    // only used for tuning feed forward
-    velocityControl = new VelocityVoltage(100, 100, true, 0.03, 0, false, false, false);
 
     StopMode = new NeutralOut();
   }
@@ -78,26 +69,6 @@ public class Climber extends SubsystemBase {
   }
 
   /**
-   * Creates a command that controls the climber motor at a specified percentage.
-   *
-   * @param percent The percentage at which to control the climber motor.
-   * @return The command object that controls the climber motor.
-   */
-  public Command climberPercentControl(double percent) {
-    return new Command() {
-      @Override
-      public void execute() {
-        climberMotor.set(percent);
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        climberMotor.set(0);
-      }
-    };
-  }
-
-  /**
    * Run the Climber motor at a given voltage, Stopping at it's max height and lowest height
    *
    * @param voltage in volts
@@ -112,9 +83,9 @@ public class Climber extends SubsystemBase {
 
       @Override
       public void execute() {
-        if (climberMotor.getPosition().getValueAsDouble() < minClimberHeight && voltage < 0) {
+        if (climberMotor.getPosition().getValueAsDouble() < minHeight && voltage < 0) {
           stopClimberMotor();
-        } else if (climberMotor.getPosition().getValueAsDouble() > maxClimberHeight
+        } else if (climberMotor.getPosition().getValueAsDouble() > maxHeight
             && voltage > 0) {
           stopClimberMotor();
         } else {
@@ -132,35 +103,6 @@ public class Climber extends SubsystemBase {
         return false;
       }
     };
-  }
-
-  /**
-   * Run the climber motor to a given position
-   *
-   * @param position in encoder value
-   * @return a command that will run the climber motor
-   */
-  public Command setPositionCommand(double position) {
-    return new Command() {
-      @Override
-      public void execute() {
-        setPosition(position);
-      }
-
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    };
-  }
-
-  /**
-   * Run the climber motor to a given position
-   *
-   * @param position in encoder value
-   */
-  public void setPosition(double position) {
-    climberMotor.setControl(motionMagicControl.withPosition(position));
   }
 
   /**
@@ -200,35 +142,6 @@ public class Climber extends SubsystemBase {
    */
   public void runVoltage(double voltage) {
     climberMotor.setControl(voltageControl.withOutput(voltage));
-  }
-
-  /**
-   * Runs the climber motor at a specified velocity.
-   *
-   * @return The command to run the climber motor at a specified velocity.
-   */
-  public Command runVelocity() {
-    return new Command() {
-      @Override
-      public void initialize() {
-        addRequirements(Climber.this);
-      }
-
-      @Override
-      public void execute() {
-        climberMotor.setControl(velocityControl);
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        stopClimberMotor();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return false;
-      }
-    };
   }
 
   /** Stop the Climber motor */
