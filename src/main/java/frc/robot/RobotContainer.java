@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AngleControllerConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.SlapperConstants;
+import frc.robot.commands.SlippageCalculator;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
@@ -475,7 +476,13 @@ public class RobotContainer {
     //         new WheelRadiusCharacterization(
     //             drive, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE))
     //     .withName("Drive Wheel Radius Characterization");
-    // return drive.getAutoPath("close 4 blue");
-    return autoChooser.getSelected();
+
+    // Slippage Calculator
+    return drive
+        .orientModules(Drive.getStraightOrientations())
+        .andThen(new SlippageCalculator(drive))
+        .withName("Slippage Calculator");
+
+    // return autoChooser.getSelected();
   }
 }

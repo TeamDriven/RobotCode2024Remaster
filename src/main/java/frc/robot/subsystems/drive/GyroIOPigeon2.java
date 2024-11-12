@@ -12,6 +12,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
 
@@ -51,5 +52,11 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.odometryYawPositions =
         yawPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
     yawPositionQueue.clear();
+
+    inputs.accel =
+        new Translation3d(
+            pigeon.getAccelerationX().getValueAsDouble(),
+            pigeon.getAccelerationY().getValueAsDouble(),
+            pigeon.getAccelerationZ().getValueAsDouble());
   }
 }

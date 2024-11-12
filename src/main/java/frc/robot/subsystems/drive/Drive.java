@@ -17,6 +17,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -526,7 +527,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the measured speeds of the robot in the robot's frame of reference. */
   @AutoLogOutput(key = "Drive/MeasuredSpeeds")
-  private ChassisSpeeds getSpeeds() {
+  public ChassisSpeeds getSpeeds() {
     return DriveConstants.kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -544,5 +545,9 @@ public class Drive extends SubsystemBase {
     return Arrays.stream(DriveConstants.moduleTranslations)
         .map(translation -> translation.getAngle().plus(new Rotation2d(Math.PI / 2.0)))
         .toArray(Rotation2d[]::new);
+  }
+
+  public Translation3d getAcceleration() {
+    return gyroInputs.accel;
   }
 }
