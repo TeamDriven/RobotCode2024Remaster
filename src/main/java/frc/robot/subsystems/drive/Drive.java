@@ -17,7 +17,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,6 +28,7 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.drive.controllers.AutoAlignController;
 import frc.robot.subsystems.drive.controllers.AutoDriveController;
 import frc.robot.subsystems.drive.controllers.HeadingController;
+import frc.robot.subsystems.drive.controllers.SimpleDriveController;
 import frc.robot.subsystems.drive.controllers.TeleopDriveController;
 import frc.robot.util.EqualsUtil;
 import frc.robot.util.LoggedTunableNumber;
@@ -65,7 +65,10 @@ public class Drive extends SubsystemBase {
     CHARACTERIZATION,
 
     /** Running wheel radius characterization routine (spinning in circle) */
-    WHEEL_RADIUS_CHARACTERIZATION
+    WHEEL_RADIUS_CHARACTERIZATION,
+
+    /** Drive output directly to wheels, controlled like teleop */
+    SIMPLE
   }
 
   public enum CoastRequest {
@@ -122,6 +125,7 @@ public class Drive extends SubsystemBase {
 
   private final TeleopDriveController teleopDriveController;
   private final AutoDriveController autoDriveController;
+  private final SimpleDriveController simpleDriveController;
   private AutoAlignController autoAlignController = null;
   private HeadingController headingController = null;
 
@@ -138,6 +142,7 @@ public class Drive extends SubsystemBase {
         new SwerveSetpointGenerator(DriveConstants.kinematics, DriveConstants.moduleTranslations);
     teleopDriveController = new TeleopDriveController();
     autoDriveController = new AutoDriveController();
+    simpleDriveController = new SimpleDriveController();
 
     configurePathPlanner();
   }
@@ -272,7 +277,7 @@ public class Drive extends SubsystemBase {
       }
       case AUTO -> {
         // Run auto drive with drive input
-        desiredSpeeds = autoDriveController.getChassisSpeeds();
+        desiredSpeeds = autoDriveController.update();
       }
       case AUTO_ALIGN -> {
         // Run auto align with drive input
@@ -286,6 +291,9 @@ public class Drive extends SubsystemBase {
       }
       case WHEEL_RADIUS_CHARACTERIZATION -> {
         desiredSpeeds = new ChassisSpeeds(0, 0, characterizationInput);
+      }
+      case SIMPLE -> {
+        desiredSpeeds = simpleDriveController.update();
       }
       default -> {}
     }
@@ -328,7 +336,7 @@ public class Drive extends SubsystemBase {
         () -> RobotState.getInstance().getEstimatedPose(), // Supplier of current robot pose
         (pose2D) ->
             RobotState.getInstance().resetPose(pose2D), // Consumer for seeding pose against auto
-        () -> autoDriveController.getChassisSpeeds(), // Supplier of ChassisSpeeds for the robot
+        () -> autoDriveController.update(), // Supplier of ChassisSpeeds for the robot
         (speeds) -> acceptAutoInput(speeds), // Consumer of ChassisSpeeds to drive the robot
         getPathFollowerConfig(),
         () -> false,
@@ -398,6 +406,15 @@ public class Drive extends SubsystemBase {
       currentDriveMode = DriveMode.AUTO;
       autoDriveController.acceptDriveInput(chassisSpeeds);
     }
+  }
+
+  public void acceptSimpleInput(double x, double y, double omega, boolean robotRelative) {
+    currentDriveMode = DriveMode.SIMPLE;
+    simpleDriveController.acceptDriveInput(x, y, omega, robotRelative);
+  }
+
+  public ChassisSpeeds getSimpleSpeeds() {
+    return simpleDriveController.update();
   }
 
   public void clearAutoInput() {
@@ -521,7 +538,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "Drive/SwerveStates/Measured")
-  private SwerveModuleState[] getModuleStates() {
+  public SwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules).map(Module::getState).toArray(SwerveModuleState[]::new);
   }
 
@@ -545,9 +562,5 @@ public class Drive extends SubsystemBase {
     return Arrays.stream(DriveConstants.moduleTranslations)
         .map(translation -> translation.getAngle().plus(new Rotation2d(Math.PI / 2.0)))
         .toArray(Rotation2d[]::new);
-  }
-
-  public Translation3d getAcceleration() {
-    return gyroInputs.accel;
   }
 }

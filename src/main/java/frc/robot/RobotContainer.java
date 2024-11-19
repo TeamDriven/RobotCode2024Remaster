@@ -478,8 +478,12 @@ public class RobotContainer {
     //     .withName("Drive Wheel Radius Characterization");
 
     // Slippage Calculator
-    return drive
-        .orientModules(Drive.getStraightOrientations())
+    return Commands.runOnce(
+            () ->
+                robotState.resetPose(
+                    new Pose2d(
+                        // robotState.getEstimatedPose().getTranslation(),
+                        new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
         .andThen(new SlippageCalculator(drive))
         .withName("Slippage Calculator");
 

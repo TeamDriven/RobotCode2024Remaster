@@ -7,26 +7,27 @@
 
 package frc.robot.commands;
 
+import static frc.robot.subsystems.drive.DriveConstants.kinematics;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.littletonrobotics.junction.Logger;
 
 public class SlippageCalculator extends Command {
-  private static final double voltage = 12;
+  private static final double linearSpeed = 1;
+  private static final double angularSpeed = 1;
 
   private SlipData data;
 
   private final Drive drivetrain;
 
-  private ChassisSpeeds prevChassisSpeeds = new ChassisSpeeds();
-
-  private static Timer timer = new Timer();
+  private Timer timer = new Timer();
 
   /** Creates a new FeedForwardCharacterization command. */
   public SlippageCalculator(Drive drivetrain) {
@@ -45,25 +46,16 @@ public class SlippageCalculator extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.runCharacterization(voltage);
-    ChassisSpeeds curChassisSpeeds = drivetrain.getSpeeds();
-    Translation2d pigeyAcceleration = drivetrain.getAcceleration().toTranslation2d();
-
-    double calculatedAcceleration =
-        curChassisSpeeds.vxMetersPerSecond - prevChassisSpeeds.vxMetersPerSecond;
-    calculatedAcceleration /= timer.get();
-    data.add(calculatedAcceleration, pigeyAcceleration.getX());
-
-    Logger.recordOutput("Slippage/calculatedAcceleration", calculatedAcceleration);
-    Logger.recordOutput("Slippage/pigeyAcceleration", pigeyAcceleration);
-
-    timer.reset();
-    prevChassisSpeeds = curChassisSpeeds;
+    drivetrain.acceptSimpleInput(linearSpeed, 0, angularSpeed, false);
+    ChassisSpeeds desiredSpeed = drivetrain.getSimpleSpeeds();
+    SwerveModuleState[] moduleState = drivetrain.getModuleStates();
+    data.add(moduleState, desiredSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    drivetrain.acceptSimpleInput(0, 0, 0, false);
     timer.stop();
     data.print();
   }
@@ -71,40 +63,50 @@ public class SlippageCalculator extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return timer.get() > 1.5;
   }
 
   public static class SlipData {
-    private final List<Double> calculatedAccelerationData = new LinkedList<>();
-    private final List<Double> pigeyAccelerationData = new LinkedList<>();
+    private final List<SwerveModuleState[]> moduleStates = new LinkedList<>();
+    private final List<ChassisSpeeds> desiredSpeeds = new LinkedList<>();
 
-    public void add(double calculatedAcceleration, double pigeyAcceleration) {
-      if (Math.abs(calculatedAcceleration) > 1E-4) {
-        calculatedAccelerationData.add(Math.abs(calculatedAcceleration));
-        pigeyAcceleration =
-            Units.MetersPerSecond.convertFrom(Math.abs(pigeyAcceleration), Units.Gs.getUnit());
-        pigeyAccelerationData.add(pigeyAcceleration);
-      }
+    public void add(SwerveModuleState[] moduleState, ChassisSpeeds desiredSpeed) {
+      moduleStates.add(moduleState);
+      desiredSpeeds.add(desiredSpeed);
     }
 
     public void print() {
-      if (calculatedAccelerationData.size() == 0 || pigeyAccelerationData.size() == 0) {
+      if (moduleStates.size() == 0 || desiredSpeeds.size() == 0) {
         return;
       }
 
-      double[] calcAccelData =
-          calculatedAccelerationData.stream().mapToDouble(Double::doubleValue).toArray();
-      double[] pigeyAccelData =
-          pigeyAccelerationData.stream().mapToDouble(Double::doubleValue).toArray();
+      SwerveModuleState[][] stateData = moduleStates.toArray(new SwerveModuleState[0][]);
+      ChassisSpeeds[] speedData = desiredSpeeds.toArray(new ChassisSpeeds[0]);
 
       double differenceAverage = 0;
-      for (int i = 0; i < calcAccelData.length; i++) {
-        differenceAverage += Math.abs(calcAccelData[i] - pigeyAccelData[i]);
+      for (int i = 0; i < stateData.length; i++) {
+        double[] moduleSpeeds = new double[4];
+        SwerveModuleState[] turnState =
+            kinematics.toSwerveModuleStates(
+                new ChassisSpeeds(0, 0, speedData[i].omegaRadiansPerSecond));
+        for (int j = 0; j < stateData[i].length; j++) {
+          Translation2d currentVector =
+              new Translation2d(stateData[i][j].speedMetersPerSecond, stateData[i][j].angle);
+          Translation2d turnVector =
+              new Translation2d(turnState[j].speedMetersPerSecond, turnState[j].angle);
+          Translation2d linearVector = currentVector.minus(turnVector);
+          moduleSpeeds[j] = linearVector.getNorm();
+        }
+        double max = Arrays.stream(moduleSpeeds).max().getAsDouble();
+        double average = Arrays.stream(moduleSpeeds).sum();
+        average -= max;
+        average /= 3;
+        differenceAverage += max - average;
       }
-      differenceAverage /= calcAccelData.length;
+      differenceAverage /= stateData.length;
 
       System.out.println("Slippage Calculator Results:");
-      System.out.println("\tCount=" + calcAccelData.length);
+      System.out.println("\tCount=" + stateData.length);
       System.out.println("\tAverage Difference=" + differenceAverage);
     }
   }
