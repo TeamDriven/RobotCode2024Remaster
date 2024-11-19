@@ -4,17 +4,19 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.AngleController;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightIntake;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Slapper;
+import frc.robot.subsystems.AngleController.AngleController;
 import frc.robot.subsystems.actuation.Actuation;
 import frc.robot.subsystems.actuation.ActuationIO;
 import frc.robot.subsystems.actuation.ActuationIOFalcon500;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -31,7 +33,7 @@ public final class Subsystems {
   public static final Intake intake = new Intake(); // My intake
   public static final Shooter shooter = new Shooter(); // My shooter
   public static final Indexer indexer = new Indexer(); // My indexer
-  public static final Climber climber = new Climber(); // My climber
+  public static final Climber climber; // My climber
   public static final AngleController angleController =
       new AngleController(); // My angle controller
   public static final LimelightShooter limelightShooter =
@@ -56,6 +58,7 @@ public final class Subsystems {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
+          climber = new Climber(new ClimberIOKraken(18));
         }
         case DEVBOT -> {
           drive =
@@ -66,6 +69,7 @@ public final class Subsystems {
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
+          climber = new Climber(new ClimberIOKraken(18));
         }
         case SIMBOT -> {
           throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
@@ -83,6 +87,7 @@ public final class Subsystems {
               new ModuleIO() {},
               new ModuleIO() {});
       actuation = new Actuation(new ActuationIO() {});
+      climber = new Climber(new ClimberIO() {});
     }
   }
 }

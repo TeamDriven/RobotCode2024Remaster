@@ -8,7 +8,7 @@ public interface ActuationIO {
     public double motorAngle = 0;
     public double encoderAngle = 0;
   }
-
+  
   default void updateInputs(ActuationIOInputs inputs) {}
 
   default void setAngle(double angle) {}
