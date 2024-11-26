@@ -1,19 +1,11 @@
-package frc.robot.subsystems.AngleController;
+package frc.robot.subsystems.angleController;
 
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.AngleController.AngleControllerIOInputsAutoLogged;
 
-import java.util.function.DoubleSupplier;
+import static frc.robot.subsystems.angleController.AngleControllerConstants.rotationsPerDegree;
+
 import org.littletonrobotics.junction.Logger;
 
 /** The AngleController class represents a subsystem that controls the angle of the shooter. */
@@ -37,6 +29,34 @@ public class AngleController extends SubsystemBase {
     } else {
       angleControllerIO.setPosition(position);
     }
+  }
+
+  public Command waitUntilAtPosition() {
+    return new Command() {
+      @Override
+      public boolean isFinished() {
+        return Math.abs(
+                angleControllerInputs.motorPosition * rotationsPerDegree
+                    - angleControllerIO.getPosition() * rotationsPerDegree) <= 0.1;
+      }
+    };
+  }
+
+  public Command waitUntilPressed() {
+    return new Command() {
+      @Override
+      public boolean isFinished() {
+        return angleControllerIO.getSensor();
+      }
+    };
+  }
+
+  public void stopMotor() {
+    angleControllerIO.stopMotor();
+  }
+
+  public void setOnSensor() {
+    angleControllerIO.setOnSensor();
   }
 
   public void setPosition(double pos) {

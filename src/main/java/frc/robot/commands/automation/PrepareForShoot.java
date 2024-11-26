@@ -3,6 +3,7 @@ package frc.robot.commands.automation;
 import static frc.robot.Constants.ShooterConstants.shooterSequenceAcceleration;
 import static frc.robot.Subsystems.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import java.util.function.DoubleSupplier;
 
@@ -22,7 +23,7 @@ public class PrepareForShoot extends ParallelCommandGroup {
     super(
         // new AutoTurnToGoal()
         shooter.speedUpShooter(speed, shooterSequenceAcceleration),
-        angleController.setPositionCommandSupplier(angle),
+        new InstantCommand(() ->angleController.setPosition(angle.getAsDouble())),
         slapper.setPositionCommand(slapperAngle));
   }
 }

@@ -1,6 +1,5 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.AngleControllerConstants.angleRestingPosition;
 import static frc.robot.Constants.SlapperConstants.slapperRestingPosition;
 import static frc.robot.Subsystems.actuation;
 import static frc.robot.Subsystems.angleController;
@@ -10,6 +9,7 @@ import static frc.robot.Subsystems.slapper;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.angleController.AngleControllerConstants;
 
 /**
  * This class represents a command group that zeros the angle of the shooter. It consists of a
@@ -23,14 +23,13 @@ public class ZeroAngle extends SequentialCommandGroup {
         new InstantCommand(shooter::stopMotors),
         slapper.setPositionCommand(slapperRestingPosition),
         new WaitCommand(0.5),
-        new InstantCommand(angleController::runDown),
         angleController.waitUntilPressed().withTimeout(4),
         new InstantCommand(angleController::stopMotor),
-        new InstantCommand(angleController::zeroOnSensor),
+        new InstantCommand(() -> angleController.setOnSensor()),
         new InstantCommand(actuation::syncPosition),
         new InstantCommand(slapper::resetPosition),
         // actuation.resetEncoderCommand(),
-        angleController.setPositionCommand(angleRestingPosition),
+        new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)),
         new InstantCommand(shooter::sitMode));
   }
 
@@ -40,14 +39,13 @@ public class ZeroAngle extends SequentialCommandGroup {
         new InstantCommand(shooter::stopMotors),
         slapper.setPositionCommand(slapperRestingPosition),
         new WaitCommand(0.25),
-        new InstantCommand(angleController::runDown),
         angleController.waitUntilPressed().withTimeout(4),
-        new InstantCommand(angleController::stopMotor),
-        new InstantCommand(angleController::zeroOnSensor),
+        new InstantCommand(() -> angleController.stopMotor()),
+        new InstantCommand(() -> angleController.setOnSensor()),
         new InstantCommand(actuation::syncPosition),
         new InstantCommand(slapper::resetPosition),
         // actuation.resetEncoderCommand(),
-        angleController.setPositionCommand(angleRestingPosition),
+        new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)),
         new InstantCommand(shooter::sitMode));
   }
 }

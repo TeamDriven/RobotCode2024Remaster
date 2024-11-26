@@ -110,19 +110,6 @@ public final class Constants {
     public static double passShotSpeed = 42.5; // 30
   }
 
-  public final class SlapperConstants {
-    public static final double slapperOffset = 99.941;
-
-    public static final double slapperGearRatio = 2.25;
-    public static final double slapperTicksPerDegree = (1.0 / 360.0);
-
-    public static final double slapperStartingPosition = 0;
-    public static final double slapperRestingPosition = 225;
-    public static final double slapperAmpPosition = 127.5;
-    public static final double slapperPushNotePosition = 150;
-    public static final double slapperPostAmpPosition = 120;
-  }
-
   public final class TurningConstants {
     public static double championshipShotOffset = 4.5;
     public static double chainShotOffset = 3;

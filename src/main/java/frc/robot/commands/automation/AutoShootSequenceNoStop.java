@@ -28,10 +28,10 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
       double restingAngle,
       DoubleSupplier slapperAngle) {
     addCommands(
-        angleController.setPositionCommandSupplier(angle),
+      new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
         slapper.setPositionCommand(slapperAngle),
         shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
-        angleController.waitUntilAtPositionSupplier(angle),
+        angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(velocity),
@@ -50,10 +50,10 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
       double indexerVelocity,
       DoubleSupplier slapperAngle) {
     addCommands(
-        angleController.setPositionCommandSupplier(angle),
+      new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
         slapper.setPositionCommand(slapperAngle),
         shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
-        angleController.waitUntilAtPositionSupplier(angle),
+        angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(velocity),

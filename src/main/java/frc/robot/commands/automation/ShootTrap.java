@@ -1,16 +1,17 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.AngleControllerConstants.angleRestingPosition;
-import static frc.robot.Constants.AngleControllerConstants.trapAngle;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.slapperRestingPosition;
 // import static frc.robot.Constants.SlapperConstants.slapperTrapPosition;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.angleController.AngleControllerConstants;
 
 /** A command group that represents the sequence of commands to shoot at the trap. */
 public class ShootTrap extends SequentialCommandGroup {
@@ -19,10 +20,10 @@ public class ShootTrap extends SequentialCommandGroup {
     addCommands(
         // new PrintCommand("Angle: " + angle.getAsDouble()),
         // new PrintCommand("Speed: " + velocity.getAsDouble())
-        angleController.setPositionCommandSupplier(() -> trapAngle),
+        new InstantCommand(() -> angleController.setPosition(trapAngle)),
         slapper.setPositionCommand(slapperRestingPosition),
         shooter.speedUpShooter(() -> trapSpeed, shooterSequenceAcceleration),
-        angleController.waitUntilAtPositionSupplier(() -> trapAngle),
+        angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> trapSpeed * 0.8),
         indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
         shooter.checkIfAtSpeedSupplier(() -> trapSpeed),
@@ -30,6 +31,6 @@ public class ShootTrap extends SequentialCommandGroup {
         actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
-        new StopShoot(angleRestingPosition, slapperRestingPosition));
+        new StopShoot(AngleControllerConstants.restingPosition, slapperRestingPosition));
   }
 }

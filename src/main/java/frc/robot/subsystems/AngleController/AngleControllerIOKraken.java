@@ -1,4 +1,6 @@
-package frc.robot.subsystems.AngleController;
+package frc.robot.subsystems.angleController;
+
+import static frc.robot.subsystems.angleController.AngleControllerConstants.rotationsPerDegree;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -85,7 +87,15 @@ public class AngleControllerIOKraken implements AngleControllerIO {
     AngleControllerMotor.setControl(stopMode);
   }
 
+  public boolean getSensor() {
+    return !zeroSensor.get();
+  }
+
+  public void setOnSensor() {
+    AngleControllerMotor.setPosition(36.0 * rotationsPerDegree);
+  }
+
   public void resetEncoder() {
-    AngleControllerMotor.setPosition(AngleControllerConstants.StartingPosition * AngleControllerConstants.rotationsPerDegree);
+    AngleControllerMotor.setPosition(AngleControllerConstants.startingPosition * AngleControllerConstants.rotationsPerDegree);
   }
 }
