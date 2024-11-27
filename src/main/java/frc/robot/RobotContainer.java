@@ -15,7 +15,6 @@ import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Constants.SlapperConstants.*;
 import static frc.robot.Constants.TurningConstants.*;
 import static frc.robot.Controls.*;
-import static frc.robot.Controls.runIntake;
 import static frc.robot.Subsystems.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -31,26 +30,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AngleControllerConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.SlapperConstants;
 import frc.robot.commands.SlippageCalculator;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
-import frc.robot.commands.automation.PrepareForShoot;
 import frc.robot.commands.automation.StopIntake;
-import frc.robot.commands.automation.StopShoot;
 import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
-import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -256,138 +246,135 @@ public class RobotContainer {
     // driver.a().whileTrue(slapper.runVoltageCommand(0.1));
 
     manualOut
-        .whileTrue(
-            new ParallelCommandGroup(
-                intake.runVoltageCommand(-4),
-                indexer.runIndexerCommand(-indexerVelocity, indexerAcceleration)))
+        .whileTrue(new ParallelCommandGroup(intake.runVoltageCommand(-4)))
+        // indexer.runIndexerCommand(-indexerVelocity, indexerAcceleration)))
         .onFalse(intake.stopIntakeCommand());
 
     manualIn
-        .whileTrue(
-            new ParallelCommandGroup(
-                intake.runVoltageCommand(4),
-                indexer.runIndexerCommand(indexerVelocity, indexerAcceleration)))
+        .whileTrue(new ParallelCommandGroup(intake.runVoltageCommand(4)))
+        // indexer.runIndexerCommand(indexerVelocity, indexerAcceleration)))
         .onFalse(intake.stopIntakeCommand());
 
     // On Stop Shooting
-    new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
-        .onTrue(
-            new StopShoot(
-                AngleControllerConstants.angleRestingPosition,
-                SlapperConstants.slapperRestingPosition));
+    // new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
+    //     .onTrue(
+    //         new StopShoot(
+    //             AngleControllerConstants.angleRestingPosition,
+    //             SlapperConstants.slapperRestingPosition));
 
-    subwooferShot.onTrue(
-        new ConditionalCommand(
-            new InstantCommand(this::incrementShootingMode),
-            setShootingTypeCommand(shootingType.SUBWOOFER),
-            () -> currentShootingType.equals(shootingType.SUBWOOFER)));
+    // subwooferShot.onTrue(
+    //     new ConditionalCommand(
+    //         new InstantCommand(this::incrementShootingMode),
+    //         setShootingTypeCommand(shootingType.SUBWOOFER),
+    //         () -> currentShootingType.equals(shootingType.SUBWOOFER)));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
-        .and(() -> currentShootingType.equals(shootingType.SUBWOOFER))
-        .onTrue(
-            new PrepareForShoot(
-                () -> subwooferShotAngle, () -> subwooferShotSpeed, () -> slapperRestingPosition));
+    // new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
+    //     .and(() -> currentShootingType.equals(shootingType.SUBWOOFER))
+    //     .onTrue(
+    //         new PrepareForShoot(
+    //             () -> subwooferShotAngle, () -> subwooferShotSpeed, () ->
+    // slapperRestingPosition));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
-        .and(() -> currentShootingType.equals(shootingType.SUBWOOFER))
-        .onTrue(
-            new AutoShootSequence(
-                    () -> subwooferShotAngle,
-                    () -> subwooferShotSpeed,
-                    angleRestingPosition,
-                    () -> slapperRestingPosition,
-                    slapperRestingPosition)
-                .andThen(new InstantCommand(this::stopShooting)));
+    // new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
+    //     .and(() -> currentShootingType.equals(shootingType.SUBWOOFER))
+    //     .onTrue(
+    //         new AutoShootSequence(
+    //                 () -> subwooferShotAngle,
+    //                 () -> subwooferShotSpeed,
+    //                 angleRestingPosition,
+    //                 () -> slapperRestingPosition,
+    //                 slapperRestingPosition)
+    //             .andThen(new InstantCommand(this::stopShooting)));
 
-    podiumShot.onTrue(
-        new ConditionalCommand(
-            new InstantCommand(this::incrementShootingMode),
-            setShootingTypeCommand(shootingType.PODIUM),
-            () -> currentShootingType.equals(shootingType.PODIUM)));
+    // podiumShot.onTrue(
+    //     new ConditionalCommand(
+    //         new InstantCommand(this::incrementShootingMode),
+    //         setShootingTypeCommand(shootingType.PODIUM),
+    //         () -> currentShootingType.equals(shootingType.PODIUM)));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
-        .and(() -> currentShootingType.equals(shootingType.PODIUM))
-        .onTrue(
-            new PrepareForShoot(
-                () -> AngleControllerConstants.podiumShotAngle,
-                () -> ShooterConstants.podiumShotSpeed,
-                () -> SlapperConstants.slapperRestingPosition));
+    // new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
+    //     .and(() -> currentShootingType.equals(shootingType.PODIUM))
+    //     .onTrue(
+    //         new PrepareForShoot(
+    //             () -> AngleControllerConstants.podiumShotAngle,
+    //             () -> ShooterConstants.podiumShotSpeed,
+    //             () -> SlapperConstants.slapperRestingPosition));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
-        .and(() -> currentShootingType.equals(shootingType.PODIUM))
-        .onTrue(
-            new SequentialCommandGroup(
-                // new AutoTurnToGoal(() -> podiumShotOffset), sorry they no want auto turn
-                new AutoShootSequence(
-                    () -> podiumShotAngle,
-                    () -> podiumShotAngle,
-                    angleRestingPosition,
-                    () -> slapperRestingPosition,
-                    slapperRestingPosition),
-                new InstantCommand(this::stopShooting),
-                new ResetDrive()));
-    passShot.onTrue(
-        new ConditionalCommand(
-            new InstantCommand(this::incrementShootingMode),
-            setShootingTypeCommand(shootingType.PASS),
-            () -> currentShootingType.equals(shootingType.PASS)));
+    // new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
+    //     .and(() -> currentShootingType.equals(shootingType.PODIUM))
+    //     .onTrue(
+    //         new SequentialCommandGroup(
+    //             // new AutoTurnToGoal(() -> podiumShotOffset), sorry they no want auto turn
+    //             new AutoShootSequence(
+    //                 () -> podiumShotAngle,
+    //                 () -> podiumShotAngle,
+    //                 angleRestingPosition,
+    //                 () -> slapperRestingPosition,
+    //                 slapperRestingPosition),
+    //             new InstantCommand(this::stopShooting),
+    //             new ResetDrive()));
+    // passShot.onTrue(
+    //     new ConditionalCommand(
+    //         new InstantCommand(this::incrementShootingMode),
+    //         setShootingTypeCommand(shootingType.PASS),
+    //         () -> currentShootingType.equals(shootingType.PASS)));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
-        .and(() -> currentShootingType.equals(shootingType.PASS))
-        .onTrue(
-            new PrepareForShoot(
-                () -> AngleControllerConstants.passShotAngle,
-                () -> ShooterConstants.passShotSpeed,
-                () -> SlapperConstants.slapperRestingPosition));
+    // new Trigger(() -> currentShootingState.equals(shootingState.PREPARED))
+    //     .and(() -> currentShootingType.equals(shootingType.PASS))
+    //     .onTrue(
+    //         new PrepareForShoot(
+    //             () -> AngleControllerConstants.passShotAngle,
+    //             () -> ShooterConstants.passShotSpeed,
+    //             () -> SlapperConstants.slapperRestingPosition));
 
-    new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
-        .and(() -> currentShootingType.equals(shootingType.PASS))
-        .onTrue(
-            new SequentialCommandGroup(
-                // new AutoTurnToGoal(() -> passShotOffset),
-                new AutoShootSequence(
-                    () -> passShotAngle,
-                    () -> passShotSpeed,
-                    angleRestingPosition,
-                    () -> slapperRestingPosition,
-                    slapperRestingPosition),
-                new InstantCommand(this::stopShooting),
-                new ResetDrive()));
+    // new Trigger(() -> currentShootingState.equals(shootingState.SHOOTING))
+    //     .and(() -> currentShootingType.equals(shootingType.PASS))
+    //     .onTrue(
+    //         new SequentialCommandGroup(
+    //             // new AutoTurnToGoal(() -> passShotOffset),
+    //             new AutoShootSequence(
+    //                 () -> passShotAngle,
+    //                 () -> passShotSpeed,
+    //                 angleRestingPosition,
+    //                 () -> slapperRestingPosition,
+    //                 slapperRestingPosition),
+    //             new InstantCommand(this::stopShooting),
+    //             new ResetDrive()));
 
-    ampShot.onTrue(
-        new ConditionalCommand(
-            new InstantCommand(this::incrementShootingMode),
-            setShootingTypeCommand(shootingType.AMP),
-            () -> currentShootingType.equals(shootingType.AMP)));
+    // ampShot.onTrue(
+    //     new ConditionalCommand(
+    //         new InstantCommand(this::incrementShootingMode),
+    //         setShootingTypeCommand(shootingType.AMP),
+    //         () -> currentShootingType.equals(shootingType.AMP)));
 
-    new Trigger(() -> currentShootingType.equals(shootingType.AMP))
-        .and(() -> currentShootingState.equals(shootingState.PREPARED))
-        .onTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
-                angleController.setPositionCommandSupplier(() -> ampAngle),
-                slapper.setPositionCommand(slapperAmpPosition)))
-        .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));
+    // new Trigger(() -> currentShootingType.equals(shootingType.AMP))
+    //     .and(() -> currentShootingState.equals(shootingState.PREPARED))
+    //     .onTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
+    //             angleController.setPositionCommandSupplier(() -> ampAngle),
+    //             slapper.setPositionCommand(slapperAmpPosition)))
+    //     .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));
 
-    new Trigger(() -> currentShootingType.equals(shootingType.AMP))
-        .and(() -> currentShootingState.equals(shootingState.SHOOTING))
-        .onTrue(
-            new ParallelCommandGroup(
-                new AutoShootSequence(
-                        () -> ampAngle,
-                        () -> ampSpeed,
-                        angleRestingPosition,
-                        () -> slapperAmpPosition,
-                        slapperPushNotePosition)
-                    .andThen(
-                        new SequentialCommandGroup(
-                                slapper.setPositionCommand(slapperPostAmpPosition),
-                                new WaitCommand(0.75),
-                                new InstantCommand(this::stopShooting))
-                            .beforeStarting(
-                                slapper.waitUntilAtPosition(slapperPushNotePosition)))));
+    // new Trigger(() -> currentShootingType.equals(shootingType.AMP))
+    //     .and(() -> currentShootingState.equals(shootingState.SHOOTING))
+    //     .onTrue(
+    //         new ParallelCommandGroup(
+    //             new AutoShootSequence(
+    //                     () -> ampAngle,
+    //                     () -> ampSpeed,
+    //                     angleRestingPosition,
+    //                     () -> slapperAmpPosition,
+    //                     slapperPushNotePosition)
+    //                 .andThen(
+    //                     new SequentialCommandGroup(
+    //                             slapper.setPositionCommand(slapperPostAmpPosition),
+    //                             new WaitCommand(0.75),
+    //                             new InstantCommand(this::stopShooting))
+    //                         .beforeStarting(
+    //                             slapper.waitUntilAtPosition(slapperPushNotePosition)))));
 
-    cancelShot.onTrue(new InstantCommand(this::stopShooting));
+    // cancelShot.onTrue(new InstantCommand(this::stopShooting));
   }
 
   /**
@@ -487,6 +474,7 @@ public class RobotContainer {
         .andThen(new SlippageCalculator(drive))
         .withName("Slippage Calculator");
 
+    // return drive.getAutoPath("TestAuto");
     // return autoChooser.getSelected();
   }
 }

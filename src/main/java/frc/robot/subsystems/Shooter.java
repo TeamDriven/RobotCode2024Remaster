@@ -8,7 +8,6 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -62,7 +61,7 @@ public class Shooter extends SubsystemBase {
 
   VelocityVoltage velocityControl;
   VelocityVoltage slowVelocityControl;
-  VoltageOut sitControl;
+  // VoltageOut sitControl;
   NeutralOut stopMode;
 
   /** Creates a new Intake. */
@@ -76,11 +75,12 @@ public class Shooter extends SubsystemBase {
             0, 0, true, 0.5, // 0.5
             1, false, false, true);
 
-    sitControl = new VoltageOut(2, false, false, false, true);
+    // sitControl = new VoltageOut(2, false, false, false, true);
 
     stopMode = new NeutralOut();
 
-    sitMode();
+    // sitMode();
+    stopMotors();
   }
 
   /** Initialize the both shooter motors */
@@ -161,7 +161,8 @@ public class Shooter extends SubsystemBase {
 
       @Override
       public void end(boolean interrupted) {
-        sitMode();
+        // sitMode();
+        stopMotors();
       }
     };
   }
@@ -187,7 +188,8 @@ public class Shooter extends SubsystemBase {
 
       @Override
       public void end(boolean interrupted) {
-        sitMode();
+        // sitMode();
+        stopMotors();
       }
     };
   }
@@ -227,7 +229,8 @@ public class Shooter extends SubsystemBase {
       public void initialize() {
         addRequirements(Shooter.this);
         if (((Double) velocity.getAsDouble()).equals(Double.NaN)) {
-          sitMode();
+          // sitMode();
+          stopMotors();
         } else {
           runShooter(velocity.getAsDouble(), acceleration);
         }
@@ -253,7 +256,8 @@ public class Shooter extends SubsystemBase {
       public void initialize() {
         addRequirements(Shooter.this);
         if (((Double) velocity.getAsDouble()).equals(Double.NaN)) {
-          sitMode();
+          // sitMode();
+          stopMotors();
         } else {
           runShooterSlow(velocity.getAsDouble(), acceleration);
         }
@@ -322,12 +326,12 @@ public class Shooter extends SubsystemBase {
   }
 
   /** Stop the shooter motors */
-  public void sitMode() {
-    leftShooterMotor.setControl(sitControl.withOutput(1.5));
-    rightShooterMotor.setControl(sitControl.withOutput(1.5));
-    // leftShooterMotor.setControl(stopMode);
-    // rightShooterMotor.setControl(stopMode);
-  }
+  // public void sitMode() {
+  //   leftShooterMotor.setControl(sitControl.withOutput(1.5));
+  //   rightShooterMotor.setControl(sitControl.withOutput(1.5));
+  //   // leftShooterMotor.setControl(stopMode);
+  //   // rightShooterMotor.setControl(stopMode);
+  // }
 
   public void stopMotors() {
     leftShooterMotor.setControl(stopMode);
