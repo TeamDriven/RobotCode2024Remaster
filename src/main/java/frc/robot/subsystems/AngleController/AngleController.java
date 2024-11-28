@@ -2,7 +2,7 @@ package frc.robot.subsystems.angleController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.AngleController.AngleControllerIOInputsAutoLogged;
+import frc.robot.subsystems.angleController.AngleControllerIOInputsAutoLogged;
 
 import static frc.robot.subsystems.angleController.AngleControllerConstants.rotationsPerDegree;
 

@@ -9,7 +9,9 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightIntake;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Slapper;
+import frc.robot.subsystems.slapper.Slapper;
+import frc.robot.subsystems.slapper.SlapperIO;
+import frc.robot.subsystems.slapper.SlapperIOKraken;
 import frc.robot.subsystems.actuation.Actuation;
 import frc.robot.subsystems.actuation.ActuationIO;
 import frc.robot.subsystems.actuation.ActuationIOFalcon500;
@@ -41,7 +43,7 @@ public final class Subsystems {
       new LimelightShooter(); // My limelight for the shooter
   public static final LimelightIntake limelightIntake =
       new LimelightIntake(); // My limelight for the intake
-  public static final Slapper slapper = new Slapper(); // My slapper
+  public static final Slapper slapper; // My slapper
 
   public static final Drive drive;
   public static final Actuation actuation; // My actuation
@@ -59,8 +61,9 @@ public final class Subsystems {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
-          climber = new Climber(new SlapperIOKraken(18));
+          climber = new Climber(new ClimberIOKraken(18));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
+          slapper = new Slapper(new SlapperIOKraken(20, 5));
         }
         case DEVBOT -> {
           drive =
@@ -71,8 +74,9 @@ public final class Subsystems {
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
-          climber = new Climber(new SlapperIOKraken(18));
+          climber = new Climber(new ClimberIOKraken(18));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
+          slapper = new Slapper(new SlapperIOKraken(20, 5));
         }
         case SIMBOT -> {
           throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
@@ -91,9 +95,8 @@ public final class Subsystems {
               new ModuleIO() {});
       actuation = new Actuation(new ActuationIO() {});
       climber = new Climber(new ClimberIO() {});
-      angleController = new AngleController(new AngleControllerIO() {
-        
-      });
+      angleController = new AngleController(new AngleControllerIO() {});
+      slapper = new Slapper(new SlapperIO() {});
     }
   }
 }

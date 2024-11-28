@@ -84,8 +84,6 @@ public class SlapperIOKraken implements SlapperIO {
 
   public void runVoltage(double speed) {
     slapperMotor.set(speed);
-    //isPositionControl = false;
-    slapperMotor.set(0);
   }
 
   public void stopMotor() {
