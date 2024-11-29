@@ -21,9 +21,9 @@ public class PickUpPieceAuto extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> actuation.setPosition(position.PICK_UP)),
         actuation.waitUntilAtPosition(),
-        intake.runVoltageCommand(voltage),
+        new InstantCommand(() -> intake.runVoltage(voltage)),
         intake.waitUntilTripped(),
-        intake.stopIntakeCommand(),
+        new InstantCommand(() -> intake.stopMotor()),
         new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 }

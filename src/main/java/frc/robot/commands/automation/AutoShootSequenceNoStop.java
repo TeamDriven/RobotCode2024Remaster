@@ -1,6 +1,6 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
@@ -37,9 +37,9 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
-        intake.stopIntakeCommand(),
+        new InstantCommand(() -> intake.stopMotor()),
         new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 
@@ -59,9 +59,9 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
-        intake.stopIntakeCommand(),
+        new InstantCommand(() -> intake.stopMotor()),
         new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 }

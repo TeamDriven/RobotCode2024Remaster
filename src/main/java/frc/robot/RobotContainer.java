@@ -9,7 +9,7 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Subsystems.*;
@@ -210,16 +210,16 @@ public class RobotContainer {
     manualOut
         .whileTrue(
             new ParallelCommandGroup(
-                intake.runVoltageCommand(-4),
+                new InstantCommand(() -> intake.runVoltage(-4)),
                 new InstantCommand(() -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
-        .onFalse(intake.stopIntakeCommand());
+        .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     manualIn
         .whileTrue(
             new ParallelCommandGroup(
-                intake.runVoltageCommand(4),
+                new InstantCommand(() -> intake.runVoltage(4)),
                 new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration))))
-        .onFalse(intake.stopIntakeCommand());
+        .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     // On Stop Shooting
     new Trigger(() -> currentShootingState.equals(shootingState.IDLE))

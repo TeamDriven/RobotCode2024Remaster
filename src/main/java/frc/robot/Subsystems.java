@@ -4,7 +4,9 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOKraken;
 import frc.robot.subsystems.LimelightIntake;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
@@ -36,7 +38,7 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
  * static references to various subsystem objects that are used in the robot.
  */
 public final class Subsystems {
-  public static final Intake intake = new Intake(); // My intake
+  public static final Intake intake; // My intake
   public static final Shooter shooter = new Shooter(); // My shooter
   public static final Indexer indexer; // My indexer
   public static final Climber climber; // My climber
@@ -67,6 +69,7 @@ public final class Subsystems {
           indexer = new Indexer(new IndexerIOKraken(17));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           slapper = new Slapper(new SlapperIOKraken(20, 5));
+          intake = new Intake(new IntakeIOKraken(13, 0, 1));
         }
         case DEVBOT -> {
           drive =
@@ -81,6 +84,7 @@ public final class Subsystems {
           indexer = new Indexer(new IndexerIOKraken(17));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           slapper = new Slapper(new SlapperIOKraken(20, 5));
+          intake = new Intake(new IntakeIOKraken(13, 0, 1));
         }
         case SIMBOT -> {
           throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
@@ -102,6 +106,7 @@ public final class Subsystems {
       angleController = new AngleController(new AngleControllerIO() {});
       slapper = new Slapper(new SlapperIO() {});
       indexer = new Indexer(new IndexerIO() {});
+      intake = new Intake(new IntakeIO() {});
     }
   }
 }

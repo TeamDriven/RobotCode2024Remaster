@@ -1,6 +1,6 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.indexerAcceleration;
@@ -38,7 +38,7 @@ public class ShootSequence extends ConditionalCommand {
             new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
             shooter.checkIfAtSpeedSupplier(velocity),
             indexer.checkIfAtSpeed(() -> indexerVelocity),
-            intake.feedCommand(feedVelocity, feedAcceleration)),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration))),
         new ShakeController(1.0, 1.0),
         () ->
             !(((Double) angle.getAsDouble()).equals(Double.NaN))
@@ -68,7 +68,7 @@ public class ShootSequence extends ConditionalCommand {
             shooter.checkIfAtSpeedSupplier(velocity),
             indexer.checkIfAtSpeed(() -> indexerVelocity),
             actuation.waitUntilAtPosition(),
-            intake.startFeedingCommand(feedVelocity, feedAcceleration),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
             new WaitCommand(1.0),
             new StopShoot(restingAngle, slapperRestingPosition)),
         new ShakeController(1.0, 1.0),
@@ -95,7 +95,7 @@ public class ShootSequence extends ConditionalCommand {
             shooter.checkIfAtSpeedSupplier(velocity),
             indexer.checkIfAtSpeed(() -> indexerVelocity),
             actuation.waitUntilAtPosition(),
-            intake.startFeedingCommand(feedVelocity, feedAcceleration),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
             new WaitCommand(1.0),
             // shooter.waitUntilRingLeft(),
             new StopShoot(restingAngle, slapperRestingPosition)),

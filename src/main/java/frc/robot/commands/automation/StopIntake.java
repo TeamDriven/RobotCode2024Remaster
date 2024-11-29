@@ -10,6 +10,6 @@ import frc.robot.subsystems.actuation.Actuation.position;
 public class StopIntake extends ParallelCommandGroup {
   public StopIntake() {
     addCommands(
-        intake.stopIntakeCommand(), new InstantCommand(() -> actuation.setPosition(position.TUCK)));
+      new InstantCommand(() -> intake.stopMotor()), new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 }

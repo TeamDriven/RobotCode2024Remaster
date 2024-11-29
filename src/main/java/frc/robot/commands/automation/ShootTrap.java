@@ -1,7 +1,7 @@
 package frc.robot.commands.automation;
 
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.subsystems.slapper.SlapperConstants.*;
 // import static frc.robot.Constants.SlapperConstants.slapperTrapPosition;
@@ -29,7 +29,7 @@ public class ShootTrap extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(() -> trapSpeed),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         new StopShoot(AngleControllerConstants.restingPosition, slapperRestingPosition));
   }

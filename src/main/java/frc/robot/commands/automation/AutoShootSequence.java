@@ -1,6 +1,6 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
@@ -37,7 +37,7 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         new StopShoot(restingAngle, slapperRestingPosition));
   }
@@ -59,7 +59,7 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
         // shooter.waitUntilRingLeft(),
         new StopShoot(restingAngle, slapperRestingPosition));
@@ -82,7 +82,7 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.checkIfAtSpeedSupplier(velocity),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(timeout).raceWith(shooter.waitUntilRingLeft()),
         new StopShoot(restingAngle, slapperRestingPosition));
   }
