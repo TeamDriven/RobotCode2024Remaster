@@ -4,6 +4,7 @@ import static frc.robot.Subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.subsystems.angleController.AngleControllerConstants;
 
 /**
  * A command group that stops the shooter, indexer motor, intake, and sets the angle of the shooter.
@@ -21,6 +22,6 @@ public class StopShoot extends ParallelCommandGroup {
         new InstantCommand(indexer::stopIndexerMotor, indexer),
         intake.stopIntakeCommand(),
         new InstantCommand(() -> angleController.setPosition(angle)),
-        slapper.setPositionCommand(slapperRestingPosition));
+        new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)));
   }
 }

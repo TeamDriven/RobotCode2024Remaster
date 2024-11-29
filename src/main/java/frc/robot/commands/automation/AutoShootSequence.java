@@ -28,8 +28,8 @@ public class AutoShootSequence extends SequentialCommandGroup {
       DoubleSupplier slapperAngle,
       double slapperRestingPosition) {
     addCommands(
-            new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-        slapper.setPositionCommand(slapperAngle),
+        new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
         shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
@@ -51,7 +51,7 @@ public class AutoShootSequence extends SequentialCommandGroup {
       double slapperRestingPosition) {
     addCommands(
         new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-        slapper.setPositionCommand(slapperAngle),
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
         shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
@@ -74,7 +74,7 @@ public class AutoShootSequence extends SequentialCommandGroup {
       double timeout) {
     addCommands(
         new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-        slapper.setPositionCommand(slapperAngle),
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
         shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),

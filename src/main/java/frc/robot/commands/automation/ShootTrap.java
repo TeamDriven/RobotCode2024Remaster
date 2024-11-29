@@ -3,7 +3,7 @@ package frc.robot.commands.automation;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
-import static frc.robot.Constants.SlapperConstants.slapperRestingPosition;
+import static frc.robot.subsystems.slapper.SlapperConstants.*;
 // import static frc.robot.Constants.SlapperConstants.slapperTrapPosition;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
@@ -21,7 +21,7 @@ public class ShootTrap extends SequentialCommandGroup {
         // new PrintCommand("Angle: " + angle.getAsDouble()),
         // new PrintCommand("Speed: " + velocity.getAsDouble())
         new InstantCommand(() -> angleController.setPosition(trapAngle)),
-        slapper.setPositionCommand(slapperRestingPosition),
+        new InstantCommand(() -> slapper.setPosition(slapperRestingPosition)),
         shooter.speedUpShooter(() -> trapSpeed, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> trapSpeed * 0.8),

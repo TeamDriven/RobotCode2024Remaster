@@ -30,7 +30,7 @@ public class ShootSequence extends ConditionalCommand {
     super(
         new SequentialCommandGroup(
             new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-            slapper.setPositionCommand(slapperAngle),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
             shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
@@ -59,7 +59,7 @@ public class ShootSequence extends ConditionalCommand {
     super(
         new SequentialCommandGroup(
             new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-            slapper.setPositionCommand(slapperAngle),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
             shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
@@ -86,7 +86,7 @@ public class ShootSequence extends ConditionalCommand {
     super(
         new SequentialCommandGroup(
             new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
-            slapper.setPositionCommand(slapperAngle),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
             shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),

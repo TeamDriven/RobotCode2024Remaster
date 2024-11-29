@@ -11,10 +11,10 @@ import static frc.robot.Constants.*;
 import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
-import static frc.robot.Constants.SlapperConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
+import static frc.robot.subsystems.slapper.SlapperConstants.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.SlapperConstants;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
@@ -49,6 +48,7 @@ import frc.robot.commands.automation.ZeroAngle;
 import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.angleController.AngleControllerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.slapper.SlapperConstants;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
 
@@ -319,7 +319,7 @@ public class RobotContainer {
             new ParallelCommandGroup(
                 new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
                 new InstantCommand(() -> angleController.setPosition(ampAngle)),
-                slapper.setPositionCommand(slapperAmpPosition)))
+                new InstantCommand(() -> slapper.setPosition(slapperAmpPosition))))
         .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));
 
     new Trigger(() -> currentShootingType.equals(shootingType.AMP))
@@ -334,11 +334,11 @@ public class RobotContainer {
                         slapperPushNotePosition)
                     .andThen(
                         new SequentialCommandGroup(
-                                slapper.setPositionCommand(slapperPostAmpPosition),
+                                new InstantCommand(() -> slapper.setPosition(slapperPostAmpPosition)),
                                 new WaitCommand(0.75),
                                 new InstantCommand(this::stopShooting))
                             .beforeStarting(
-                                slapper.waitUntilAtPosition(slapperPushNotePosition)))));
+                                new InstantCommand(() -> slapper.waitUntilAtPosition())))));
 
     cancelShot.onTrue(new InstantCommand(this::stopShooting));
   }

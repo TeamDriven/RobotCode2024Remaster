@@ -24,7 +24,7 @@ public class PrepareForShoot extends ParallelCommandGroup {
         // new AutoTurnToGoal()
         shooter.speedUpShooter(speed, shooterSequenceAcceleration),
         new InstantCommand(() ->angleController.setPosition(angle.getAsDouble())),
-        slapper.setPositionCommand(slapperAngle));
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())));
   }
 }
 

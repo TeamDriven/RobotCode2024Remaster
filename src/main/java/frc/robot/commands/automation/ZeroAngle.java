@@ -27,7 +27,7 @@ public class ZeroAngle extends SequentialCommandGroup {
         new InstantCommand(angleController::stopMotor),
         new InstantCommand(() -> angleController.setOnSensor()),
         new InstantCommand(actuation::syncPosition),
-        new InstantCommand(slapper::resetPosition),
+        new InstantCommand(() -> slapper.resetPosition()),
         // actuation.resetEncoderCommand(),
         new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)),
         new InstantCommand(shooter::sitMode));
@@ -37,7 +37,7 @@ public class ZeroAngle extends SequentialCommandGroup {
     addCommands(
         // new InstantCommand(actuation::stopMotor),
         new InstantCommand(shooter::stopMotors),
-        slapper.setPositionCommand(slapperRestingPosition),
+        new InstantCommand(() -> slapper.setPosition(slapperRestingPosition)),
         new WaitCommand(0.25),
         angleController.waitUntilPressed().withTimeout(4),
         new InstantCommand(() -> angleController.stopMotor()),

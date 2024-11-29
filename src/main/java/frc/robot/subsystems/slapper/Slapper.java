@@ -1,8 +1,12 @@
 package frc.robot.subsystems.slapper;
 
+import static frc.robot.Subsystems.slapper;
+import static frc.robot.subsystems.slapper.SlapperConstants.rotationsPerDegree;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -46,6 +50,17 @@ public class Slapper extends SubsystemBase {
     }
   }
 
+  public Command waitUntilAtPosition() {
+    return new Command() {
+      @Override
+      public boolean isFinished() {
+        return Math.abs(
+                slapperInputs.motorPosition * rotationsPerDegree
+                    - slapperIO.getPosition() * rotationsPerDegree) <= 0.1;
+      }
+    };
+  }
+
   public void runVoltage(double voltage) {
     this.voltage = voltage;
     mode = controlMode.VOLTAGE;
@@ -58,5 +73,9 @@ public class Slapper extends SubsystemBase {
 
   public void stopMotor() {
     mode = controlMode.STOP;
+  }
+
+  public void resetPosition() {
+    setPosition(slapperIO.getPosition() * rotationsPerDegree);
   }
 }
