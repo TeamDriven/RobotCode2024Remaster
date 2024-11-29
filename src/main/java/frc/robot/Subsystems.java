@@ -4,11 +4,13 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightIntake;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerIOKraken;
 import frc.robot.subsystems.slapper.Slapper;
 import frc.robot.subsystems.slapper.SlapperIO;
 import frc.robot.subsystems.slapper.SlapperIOKraken;
@@ -36,7 +38,7 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
 public final class Subsystems {
   public static final Intake intake = new Intake(); // My intake
   public static final Shooter shooter = new Shooter(); // My shooter
-  public static final Indexer indexer = new Indexer(); // My indexer
+  public static final Indexer indexer; // My indexer
   public static final Climber climber; // My climber
   public static final AngleController angleController; // My angle controller
   public static final LimelightShooter limelightShooter =
@@ -62,6 +64,7 @@ public final class Subsystems {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
           climber = new Climber(new ClimberIOKraken(18));
+          indexer = new Indexer(new IndexerIOKraken(17));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           slapper = new Slapper(new SlapperIOKraken(20, 5));
         }
@@ -75,6 +78,7 @@ public final class Subsystems {
                   new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
           climber = new Climber(new ClimberIOKraken(18));
+          indexer = new Indexer(new IndexerIOKraken(17));
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           slapper = new Slapper(new SlapperIOKraken(20, 5));
         }
@@ -97,6 +101,7 @@ public final class Subsystems {
       climber = new Climber(new ClimberIO() {});
       angleController = new AngleController(new AngleControllerIO() {});
       slapper = new Slapper(new SlapperIO() {});
+      indexer = new Indexer(new IndexerIO() {});
     }
   }
 }

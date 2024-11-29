@@ -19,7 +19,7 @@ public class StopShoot extends ParallelCommandGroup {
   public StopShoot(double angle, double slapperRestingPosition) {
     addCommands(
         new InstantCommand(shooter::sitMode, shooter),
-        new InstantCommand(indexer::stopIndexerMotor, indexer),
+        new InstantCommand(() -> indexer.stopMotor()),
         intake.stopIntakeCommand(),
         new InstantCommand(() -> angleController.setPosition(angle)),
         new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)));

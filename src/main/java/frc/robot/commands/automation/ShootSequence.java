@@ -1,9 +1,10 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.indexerAcceleration;
+import static frc.robot.subsystems.indexer.IndexerConstants.indexerVelocity;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -34,9 +35,9 @@ public class ShootSequence extends ConditionalCommand {
             shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
             shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
             intake.feedCommand(feedVelocity, feedAcceleration)),
         new ShakeController(1.0, 1.0),
         () ->
@@ -63,9 +64,9 @@ public class ShootSequence extends ConditionalCommand {
             shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
             shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
             actuation.waitUntilAtPosition(),
             intake.startFeedingCommand(feedVelocity, feedAcceleration),
             new WaitCommand(1.0),
@@ -90,9 +91,9 @@ public class ShootSequence extends ConditionalCommand {
             shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
             angleController.waitUntilAtPosition(),
             shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
             shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
             actuation.waitUntilAtPosition(),
             intake.startFeedingCommand(feedVelocity, feedAcceleration),
             new WaitCommand(1.0),

@@ -8,7 +8,7 @@
 package frc.robot;
 
 import static frc.robot.Constants.*;
-import static frc.robot.Constants.IndexerConstants.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Controls.*;
@@ -47,7 +47,6 @@ import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
 import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.angleController.AngleControllerConstants;
-import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.slapper.SlapperConstants;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -212,14 +211,14 @@ public class RobotContainer {
         .whileTrue(
             new ParallelCommandGroup(
                 intake.runVoltageCommand(-4),
-                indexer.runIndexerCommand(-indexerVelocity, indexerAcceleration)))
+                new InstantCommand(() -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
         .onFalse(intake.stopIntakeCommand());
 
     manualIn
         .whileTrue(
             new ParallelCommandGroup(
                 intake.runVoltageCommand(4),
-                indexer.runIndexerCommand(indexerVelocity, indexerAcceleration)))
+                new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration))))
         .onFalse(intake.stopIntakeCommand());
 
     // On Stop Shooting

@@ -1,9 +1,9 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.IndexerConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -33,9 +33,9 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-        indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+        new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
         shooter.checkIfAtSpeedSupplier(velocity),
-        indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+        indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
@@ -55,9 +55,9 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-        indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+        new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
         shooter.checkIfAtSpeedSupplier(velocity),
-        indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+        indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
@@ -78,9 +78,9 @@ public class AutoShootSequence extends SequentialCommandGroup {
         shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
         angleController.waitUntilAtPosition(),
         shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-        indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
+        new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
         shooter.checkIfAtSpeedSupplier(velocity),
-        indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
+        indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
         intake.startFeedingCommand(feedVelocity, feedAcceleration),
         new WaitCommand(timeout).raceWith(shooter.waitUntilRingLeft()),

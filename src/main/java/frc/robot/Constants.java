@@ -91,11 +91,6 @@ public final class Constants {
     public static final double outtakeVelocity = -15;
     public static final double outtakeAcceleration = 40;
   }
-
-  public final class IndexerConstants {
-    public static final double indexerVelocity = 60; // 40 amp //60 shooting
-    public static final double indexerAcceleration = 100;
-  }
   
   public final class ShooterConstants {
     public static final double shooterSequenceAcceleration = 100;

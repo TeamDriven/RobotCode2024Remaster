@@ -1,6 +1,5 @@
 package frc.robot.subsystems.slapper;
 
-import static frc.robot.Subsystems.slapper;
 import static frc.robot.subsystems.slapper.SlapperConstants.rotationsPerDegree;
 
 import org.littletonrobotics.junction.Logger;
