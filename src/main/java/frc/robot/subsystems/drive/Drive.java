@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
+import frc.robot.subsystems.drive.DriveConstants.ModuleConfig;
 import frc.robot.subsystems.drive.controllers.AutoAlignController;
 import frc.robot.subsystems.drive.controllers.AutoDriveController;
 import frc.robot.subsystems.drive.controllers.HeadingController;
@@ -106,7 +107,7 @@ public class Drive extends SubsystemBase {
   private boolean brakeModeEnabled = true;
 
   @AutoLogOutput(key = "Drive/CoastRequest")
-  private CoastRequest coastRequest = CoastRequest.AUTOMATIC;
+  public CoastRequest coastRequest = CoastRequest.AUTOMATIC;
 
   private boolean lastEnabled = false;
 
@@ -243,9 +244,9 @@ public class Drive extends SubsystemBase {
                 Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecThreshold.get())) {
       lastMovementTimer.reset();
     }
-    if (DriverStation.isEnabled() && !lastEnabled) {
-      coastRequest = CoastRequest.AUTOMATIC;
-    }
+    // if (DriverStation.isEnabled() && !lastEnabled) {
+    //   coastRequest = CoastRequest.AUTOMATIC;
+    // }
 
     lastEnabled = DriverStation.isEnabled();
     switch (coastRequest) {
@@ -319,6 +320,10 @@ public class Drive extends SubsystemBase {
       }
       Logger.recordOutput("Drive/SwerveStates/Setpoints", optimizedSetpointStates);
       Logger.recordOutput("Drive/SwerveStates/Torques", optimizedSetpointTorques);
+    }
+
+    if (DriveConstants.shouldPrintZeros) {
+      printZeros();
     }
 
     // Log chassis speeds and swerve states
@@ -536,6 +541,25 @@ public class Drive extends SubsystemBase {
         .withName("Orient Modules");
   }
 
+  public void printZeros() {
+    ModuleConfig[] configs = DriveConstants.moduleConfigs;
+    Rotation2d[] rots = getAbsoluteModuleRotations();
+    for (int i = 0; i < configs.length; i++) {
+      System.out.printf(
+          "new ModuleConfig(%d, %d, %d, new Rotation2d(%f), %b)",
+          configs[i].driveID(),
+          configs[i].turnID(),
+          configs[i].absoluteEncoderChannel(),
+          rots[i].getRadians(),
+          configs[i].turnMotorInverted());
+      if (i == configs.length - 1) {
+        System.out.println();
+      } else {
+        System.out.println(",");
+      }
+    }
+  }
+
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "Drive/SwerveStates/Measured")
   public SwerveModuleState[] getModuleStates() {
@@ -546,6 +570,14 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Drive/MeasuredSpeeds")
   public ChassisSpeeds getSpeeds() {
     return DriveConstants.kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  public Rotation2d[] getAbsoluteModuleRotations() {
+    Rotation2d[] rots = new Rotation2d[modules.length];
+    for (int i = 0; i < modules.length; i++) {
+      rots[i] = modules[i].getAngle().plus(DriveConstants.moduleConfigs[i].absoluteEncoderOffset());
+    }
+    return rots;
   }
 
   public static Rotation2d[] getStraightOrientations() {
