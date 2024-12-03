@@ -1,0 +1,30 @@
+package frc.robot.subsystems.limelightIntake;
+
+import static frc.robot.subsystems.slapper.SlapperConstants.rotationsPerDegree;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.slapper.SlapperIOInputsAutoLogged;
+
+import org.littletonrobotics.junction.Logger;
+
+/**
+ * The `Slapper` class represents a subsystem that controls the Slapper mechanism of the robot. It
+ * provides methods to control the Slapper motor, set the position of the Slapper, and run the
+ * Slapper at a specified voltage.
+ */
+public class LimelightIntake extends SubsystemBase {
+  private final LimelightIntakeIO limelightIntakeIO;
+  private final LimelightIntakeIOInputsAutoLogged limelightIntakeInputs = new LimelightIntakeIOInputsAutoLogged();
+
+  public LimelightIntake(LimelightIntakeIO limelightIntakeIO) {
+    this.limelightIntakeIO = limelightIntakeIO;
+  }
+
+  @Override
+  public void periodic() {
+    limelightIntakeIO.updateInputs(limelightIntakeInputs);
+    Logger.processInputs("LimelightIntake", limelightIntakeInputs);
+  }
+}

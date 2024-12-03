@@ -4,7 +4,8 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.LimelightIntake;
+import frc.robot.subsystems.limelightIntake.LimelightIntake;
+import frc.robot.subsystems.limelightIntake.LimelightIntakeIOLimelight;
 import frc.robot.subsystems.LimelightShooter;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
@@ -47,8 +48,7 @@ public final class Subsystems {
   public static final AngleController angleController; // My angle controller
   public static final LimelightShooter limelightShooter =
       new LimelightShooter(); // My limelight for the shooter
-  public static final LimelightIntake limelightIntake =
-      new LimelightIntake(); // My limelight for the intake
+  public static final LimelightIntake limelightIntake; // My limelight for the intake
   public static final Slapper slapper; // My slapper
 
   public static final Drive drive;
@@ -73,6 +73,7 @@ public final class Subsystems {
           angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           slapper = new Slapper(new SlapperIOKraken(20, 5));
           intake = new Intake(new IntakeIOKraken(13, 0, 1));
+          limelightIntake = new LimelightIntake(new LimelightIntakeIOLimelight());
         }
         case DEVBOT -> {
           drive =

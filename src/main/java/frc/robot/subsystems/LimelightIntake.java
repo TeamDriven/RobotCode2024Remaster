@@ -140,42 +140,7 @@ public class LimelightIntake extends SubsystemBase {
     // return 1;
   }
 
-  /**
-   * Prints the name of piece that the Limelight detects
-   *
-   * @param pipeline Pipeline enum value of the piece to detect
-   * @return Command to be scheduled
-   */
-  public Command printPieceNameCommand(Pipeline pipeline) {
-    return new Command() {
-      @Override
-      public void initialize() {
-        turnOnLimelight();
-        setLimelightPipeline(pipeline);
-      }
-
-      @Override
-      public void execute() {
-        printPieceName();
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        turnOffLimelight();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return false;
-      }
-    };
-  }
-
-  /** Prints the name of piece that the Limelight detects */
-  public void printPieceName() {
-    System.out.println(
-        NetworkTableInstance.getDefault().getTable(LIMELIGHT).getEntry("tclass").getString(null));
-  }
+ 
 
   /**
    * Finds the pose of the robot when detecting 3D april tags
