@@ -8,12 +8,12 @@
 package frc.robot;
 
 import static frc.robot.Constants.*;
-import static frc.robot.subsystems.indexer.IndexerConstants.*;
-import static frc.robot.subsystems.intake.IntakeConstants.*;
-import static frc.robot.Constants.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.subsystems.slapper.SlapperConstants.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
@@ -211,7 +211,8 @@ public class RobotContainer {
         .whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> intake.runVoltage(-4)),
-                new InstantCommand(() -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
+                new InstantCommand(
+                    () -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
         .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     manualIn
@@ -225,8 +226,7 @@ public class RobotContainer {
     new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
         .onTrue(
             new StopShoot(
-                AngleControllerConstants.restingPosition,
-                SlapperConstants.slapperRestingPosition));
+                AngleControllerConstants.restingPosition, SlapperConstants.slapperRestingPosition));
 
     subwooferShot.onTrue(
         new ConditionalCommand(
@@ -333,7 +333,8 @@ public class RobotContainer {
                         slapperPushNotePosition)
                     .andThen(
                         new SequentialCommandGroup(
-                                new InstantCommand(() -> slapper.setPosition(slapperPostAmpPosition)),
+                                new InstantCommand(
+                                    () -> slapper.setPosition(slapperPostAmpPosition)),
                                 new WaitCommand(0.75),
                                 new InstantCommand(this::stopShooting))
                             .beforeStarting(

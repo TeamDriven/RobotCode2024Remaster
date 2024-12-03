@@ -1,9 +1,9 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.subsystems.intake.IntakeConstants.*;
-import static frc.robot.Constants.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -30,11 +30,11 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
         new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
-        shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
+        new InstantCommand(() -> shooter.runShooter(velocity.getAsDouble(), shooterSequenceAcceleration)),
         angleController.waitUntilAtPosition(),
-        shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
+        shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.8),
         new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
-        shooter.checkIfAtSpeedSupplier(velocity),
+        shooter.checkIfAtSpeed(velocity.getAsDouble()),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
         new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
@@ -52,11 +52,11 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
         new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
-        shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
+        new InstantCommand(() -> shooter.runShooterSlow(velocity.getAsDouble(), shooterSequenceAcceleration)),
         angleController.waitUntilAtPosition(),
-        shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
+        shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.8),
         new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
-        shooter.checkIfAtSpeedSupplier(velocity),
+        shooter.checkIfAtSpeed(velocity.getAsDouble()),
         indexer.checkIfAtSpeed(() -> indexerVelocity),
         actuation.waitUntilAtPosition(),
         new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),

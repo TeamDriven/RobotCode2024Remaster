@@ -9,7 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class ClimberIOKraken implements ClimberIO {
-  private TalonFX climberMotor;//18 id
+  private TalonFX climberMotor; // 18 id
 
   private VoltageOut voltageControl;
   private NeutralOut StopMode;

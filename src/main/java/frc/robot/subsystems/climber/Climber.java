@@ -1,7 +1,7 @@
 package frc.robot.subsystems.climber;
 
-import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The `Climber` class represents a subsystem that controls the climber mechanism of the robot. It
@@ -17,11 +17,11 @@ public class Climber extends SubsystemBase {
   public Climber(ClimberIO climberIO) {
     this.climberIO = climberIO;
   }
-  
+
   @Override
   public void periodic() {
     climberIO.updateInputs(climberInputs);
-    Logger.processInputs("Actuation", climberInputs);
+    Logger.processInputs("Climber", climberInputs);
 
     if (voltage == 0) {
       climberIO.stopMotor();

@@ -9,10 +9,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IndexerIOKraken implements IndexerIO {
-    private TalonFX indexerMotor;
+  private TalonFX indexerMotor;
 
-    VelocityVoltage velocityControl;
-    NeutralOut stopMode;
+  VelocityVoltage velocityControl;
+  NeutralOut stopMode;
 
   public IndexerIOKraken(int motorID) {
     indexerMotor = new TalonFX(motorID);

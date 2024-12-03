@@ -9,7 +9,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -79,7 +78,10 @@ public class SlapperIOKraken implements SlapperIO {
   public void updateInputs(SlapperIOInputs inputs) {
     inputs.motorPosition = slapperMotor.getPosition().getValueAsDouble();
     inputs.motorVelocity = slapperMotor.getVelocity().getValueAsDouble();
-    inputs.encoderAngle = throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree - SlapperConstants.slapperOffset;;
+    inputs.encoderAngle =
+        throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree
+            - SlapperConstants.slapperOffset;
+    ;
   }
 
   public void runVoltage(double speed) {
@@ -100,7 +102,8 @@ public class SlapperIOKraken implements SlapperIO {
   public double getPosition() {
     // return throughboreEncoder.getDistance() - slapperOffset;
     // return slapperMotor.getPosition().getValueAsDouble() / slapperTicksPerDegree;
-    return throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree - SlapperConstants.slapperOffset;
+    return throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree
+        - SlapperConstants.slapperOffset;
   }
 
   public void resetPosition() {

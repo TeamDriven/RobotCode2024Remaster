@@ -1,8 +1,7 @@
 package frc.robot.subsystems.slapper;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.controller.PIDController;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface SlapperIO {
   @AutoLog
@@ -16,7 +15,9 @@ public interface SlapperIO {
 
   default void runVoltage(double voltage) {}
 
-  default double getPosition() {return 0;}
+  default double getPosition() {
+    return 0;
+  }
 
   default void resetPosition() {}
 

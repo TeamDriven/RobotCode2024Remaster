@@ -2,11 +2,10 @@ package frc.robot.subsystems.slapper;
 
 import static frc.robot.subsystems.slapper.SlapperConstants.rotationsPerDegree;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The `Slapper` class represents a subsystem that controls the Slapper mechanism of the robot. It
@@ -34,15 +33,15 @@ public class Slapper extends SubsystemBase {
   public Slapper(SlapperIO slapperIO) {
     this.slapperIO = slapperIO;
   }
-  
+
   @Override
   public void periodic() {
     slapperIO.updateInputs(slapperInputs);
-    Logger.processInputs("Actuation", slapperInputs);
+    Logger.processInputs("Slapper", slapperInputs);
 
     if (mode == controlMode.POSITION) {
       slapperIO.runMotorToPosition(desiredPos, feedForward, posPID);
-    }else if (mode == controlMode.STOP) {
+    } else if (mode == controlMode.STOP) {
       slapperIO.stopMotor();
     } else if (mode == controlMode.VOLTAGE) {
       slapperIO.runVoltage(voltage);
@@ -55,7 +54,8 @@ public class Slapper extends SubsystemBase {
       public boolean isFinished() {
         return Math.abs(
                 slapperInputs.motorPosition * rotationsPerDegree
-                    - slapperIO.getPosition() * rotationsPerDegree) <= 0.1;
+                    - slapperIO.getPosition() * rotationsPerDegree)
+            <= 0.1;
       }
     };
   }

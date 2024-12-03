@@ -1,11 +1,9 @@
 package frc.robot.subsystems.indexer;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The `Climber` class represents a subsystem that controls the climber mechanism of the robot. It
@@ -19,16 +17,14 @@ public class Indexer extends SubsystemBase {
   private double velocity = 0;
   private double acceleration = 0;
 
-  
-
   public Indexer(IndexerIO IndexerIO) {
     this.indexerIO = IndexerIO;
   }
-  
+
   @Override
   public void periodic() {
     indexerIO.updateInputs(indexerInputs);
-    Logger.processInputs("Actuation", indexerInputs);
+    Logger.processInputs("Indexer", indexerInputs);
 
     if (velocity == 0) {
       indexerIO.stopMotor();

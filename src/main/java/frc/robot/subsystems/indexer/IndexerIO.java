@@ -12,7 +12,9 @@ public interface IndexerIO {
 
   default void runIndexer(double velocity, double acceleration) {}
 
-  default double getVelocity() {return 0;}
+  default double getVelocity() {
+    return 0;
+  }
 
   default void stopMotor() {}
 }

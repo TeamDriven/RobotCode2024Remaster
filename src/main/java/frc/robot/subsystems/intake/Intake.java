@@ -1,8 +1,8 @@
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The `Slapper` class represents a subsystem that controls the Slapper mechanism of the robot. It
@@ -28,15 +28,15 @@ public class Intake extends SubsystemBase {
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
   }
-  
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(intakeInputs);
-    Logger.processInputs("Actuation", intakeInputs);
+    Logger.processInputs("Intake", intakeInputs);
 
     if (mode == controlMode.FEED) {
       intakeIO.feedMotor(velocity, acceleration);
-    }else if (mode == controlMode.STOP) {
+    } else if (mode == controlMode.STOP) {
       intakeIO.stopMotor();
     } else if (mode == controlMode.VOLTAGE) {
       intakeIO.runVoltage(voltage);
@@ -58,7 +58,7 @@ public class Intake extends SubsystemBase {
       }
     };
   }
-  
+
   public void feedMotor(double voltage, double acceleration) {
     this.velocity = velocity;
     this.acceleration = acceleration;

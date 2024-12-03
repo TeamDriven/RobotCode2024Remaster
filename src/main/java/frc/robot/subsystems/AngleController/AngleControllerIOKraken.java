@@ -10,13 +10,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class AngleControllerIOKraken implements AngleControllerIO {
-  private TalonFX AngleControllerMotor; //19
+  private TalonFX AngleControllerMotor; // 19
 
-  private DigitalInput zeroSensor; //4
+  private DigitalInput zeroSensor; // 4
 
   MotionMagicVoltage motionMagicControl;
   NeutralOut stopMode;
@@ -75,7 +74,8 @@ public class AngleControllerIOKraken implements AngleControllerIO {
   }
 
   public void setPosition(double position) {
-    AngleControllerMotor.setControl(motionMagicControl.withPosition(position * AngleControllerConstants.rotationsPerDegree));
+    AngleControllerMotor.setControl(
+        motionMagicControl.withPosition(position * AngleControllerConstants.rotationsPerDegree));
   }
 
   public double getPosition() {
@@ -95,6 +95,7 @@ public class AngleControllerIOKraken implements AngleControllerIO {
   }
 
   public void resetEncoder() {
-    AngleControllerMotor.setPosition(AngleControllerConstants.startingPosition * AngleControllerConstants.rotationsPerDegree);
+    AngleControllerMotor.setPosition(
+        AngleControllerConstants.startingPosition * AngleControllerConstants.rotationsPerDegree);
   }
 }

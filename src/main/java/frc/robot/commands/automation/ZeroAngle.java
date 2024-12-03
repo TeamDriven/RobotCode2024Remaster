@@ -1,10 +1,10 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.subsystems.slapper.SlapperConstants.*;
 import static frc.robot.Subsystems.actuation;
 import static frc.robot.Subsystems.angleController;
 import static frc.robot.Subsystems.shooter;
 import static frc.robot.Subsystems.slapper;
+import static frc.robot.subsystems.slapper.SlapperConstants.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -29,14 +29,15 @@ public class ZeroAngle extends SequentialCommandGroup {
         new InstantCommand(actuation::syncPosition),
         new InstantCommand(() -> slapper.resetPosition()),
         // actuation.resetEncoderCommand(),
-        new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)),
+        new InstantCommand(
+            () -> angleController.setPosition(AngleControllerConstants.restingPosition)),
         new InstantCommand(shooter::sitMode));
   }
 
   public ZeroAngle(double angleRestingPosition) {
     addCommands(
         // new InstantCommand(actuation::stopMotor),
-        new InstantCommand(shooter::stopMotors),
+        new InstantCommand(() -> shooter.stopMotors()),
         new InstantCommand(() -> slapper.setPosition(slapperRestingPosition)),
         new WaitCommand(0.25),
         angleController.waitUntilPressed().withTimeout(4),
@@ -45,7 +46,8 @@ public class ZeroAngle extends SequentialCommandGroup {
         new InstantCommand(actuation::syncPosition),
         new InstantCommand(slapper::resetPosition),
         // actuation.resetEncoderCommand(),
-        new InstantCommand(() -> angleController.setPosition(AngleControllerConstants.restingPosition)),
+        new InstantCommand(
+            () -> angleController.setPosition(AngleControllerConstants.restingPosition)),
         new InstantCommand(shooter::sitMode));
   }
 }
