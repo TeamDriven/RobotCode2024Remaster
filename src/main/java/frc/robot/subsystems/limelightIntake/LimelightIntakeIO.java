@@ -2,6 +2,8 @@ package frc.robot.subsystems.limelightIntake;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import frc.robot.subsystems.limelightIntake.LimelightIntakeIOLimelight.LightMode;
+
 public interface LimelightIntakeIO {
   @AutoLog
   class LimelightIntakeIOInputs {
@@ -16,6 +18,8 @@ public interface LimelightIntakeIO {
   default void turnOnLimelight() {}
 
   default void turnOffLimelight() {}
+
+  default void setLights(LightMode lightMode) {}
 
   default double[] getRobotPose() { return new double[6];}
 

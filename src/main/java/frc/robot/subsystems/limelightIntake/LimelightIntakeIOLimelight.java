@@ -1,21 +1,7 @@
 package frc.robot.subsystems.limelightIntake;
 
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.slapper.SlapperIO.SlapperIOInputs;
 
 public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
   public final String LIMELIGHT = "limelight-intake";
@@ -49,7 +35,12 @@ public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
     turnOnLimelight();
   }
 
-  public void updateInputs(LimelightIntakeIOInputs inputs) {}
+  public void updateInputs(LimelightIntakeIOInputs inputs) {
+    inputs.TA = getTA();
+    inputs.TS = getTS();
+    inputs.TX = getTX();
+    inputs.TY = getTY();
+  }
 
   public void turnOnLimelight() {
     NetworkTableInstance.getDefault().getTable(LIMELIGHT).getEntry("camMode").setNumber(0);
@@ -99,5 +90,38 @@ public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
   public void prepareForNote() {
     turnOnLimelight();
     setLimelightPipeline(Pipeline.Note);
+  }
+
+  public Double getTX() {
+    double tX = table.getEntry("tx").getDouble(0);
+    return (tX != 0) ? tX : Double.NaN;
+    // return 1;
+  }
+
+  /**
+   * @return Y position of the object (degrees)
+   */
+  public Double getTY() {
+    double tY = table.getEntry("ty").getDouble(0);
+    return (tY != 0) ? tY : Double.NaN;
+    // return 1;
+  }
+
+  /**
+   * @return Area of the screen the object takes up
+   */
+  public Double getTA() {
+    double tA = table.getEntry("ta").getDouble(0);
+    return (tA != 0) ? tA : Double.NaN;
+    // return 1;
+  }
+
+  /**
+   * @return Skew (rotation) of the object
+   */
+  public Double getTS() {
+    double tS = table.getEntry("ts").getDouble(0);
+    return (tS != 0) ? tS : Double.NaN;
+    // return 1;
   }
 }
