@@ -1,13 +1,13 @@
-package frc.robot.subsystems.limelightIntake;
+package frc.robot.subsystems.limelightShooter;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
-  public final String LIMELIGHT = "limelight-intake";
+public class LimelightShooterIOLimelight implements LimelightShooterIO {
+  public final static String LIMELIGHT = "limelight-shooter";
   NetworkTable table = NetworkTableInstance.getDefault().getTable(LIMELIGHT);
 
-  public static enum IntakeLightMode {
+  public static enum ShooterLightMode {
     DEFAULT(0),
     OFF(1),
     BLINK(2),
@@ -15,27 +15,27 @@ public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
 
     public int lightNum;
 
-    private IntakeLightMode(int lightNum) {
+    private ShooterLightMode(int lightNum) {
       this.lightNum = lightNum;
     }
   };
 
-  public static enum IntakePipeline {
-    Note(0);
-    // AprilTag3D(1);
+  public static enum ShooterPipeline {
+    PoseEstimation(0);
 
     public int pipelineNum;
 
-    private IntakePipeline(int pipelineNum) {
+    private ShooterPipeline(int pipelineNum) {
       this.pipelineNum = pipelineNum;
     }
   }
 
-  public LimelightIntakeIOLimelight() {
+
+  public LimelightShooterIOLimelight() {
     turnOnLimelight();
   }
 
-  public void updateInputs(LimelightIntakeIOInputs inputs) {
+  public void updateInputs(LimelightShooterIOInputs inputs) {
     inputs.TA = getTA();
     inputs.TS = getTS();
     inputs.TX = getTX();
@@ -43,27 +43,24 @@ public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
   }
 
   public void turnOnLimelight() {
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT).getEntry("camMode").setNumber(0);
-    setLights(IntakeLightMode.DEFAULT);
+    table.getEntry("camMode").setNumber(0);
+    setLights(ShooterLightMode.DEFAULT);
   }
 
   /** Switches the camera to inactive and turns off the lights */
   public void turnOffLimelight() {
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT).getEntry("camMode").setNumber(1);
-    setLights(IntakeLightMode.OFF);
+    table.getEntry("camMode").setNumber(1);
+    setLights(ShooterLightMode.OFF);
   }
 
-  public void setLights(IntakeLightMode lightMode) {
-    NetworkTableInstance.getDefault()
-        .getTable(LIMELIGHT)
-        .getEntry("ledMode")
-        .setNumber(lightMode.lightNum);
+  public void setLights(ShooterLightMode lightMode) {
+    table.getEntry("ledMode").setNumber(lightMode.lightNum);
   }
 
-  public double getApriltagID() {
-    double id = NetworkTableInstance.getDefault().getTable(LIMELIGHT).getEntry("tid").getDouble(0);
-    // SmartDashboard.putNumber("Apriltag id", id);
-    return id;
+
+  public Double getApriltagID() {
+    double id = table.getEntry("tid").getDouble(0);
+    return (id != 0) ? id : Double.NaN;
     // return 1;
   }
 
@@ -75,23 +72,18 @@ public class LimelightIntakeIOLimelight implements LimelightIntakeIO {
               .getTable(LIMELIGHT)
               .getEntry("botpose")
               .getDoubleArray(pose);
-    } catch (ArrayIndexOutOfBoundsException e) {}
+    } catch (ArrayIndexOutOfBoundsException e) {
+      // System.out.println("No 3D April tag detected");
+    }
     return pose;
     // return null;
   }
 
-   public void setLimelightPipeline(IntakePipeline pipeline) {
-    NetworkTableInstance.getDefault()
-        .getTable(LIMELIGHT)
-        .getEntry("pipeline")
-        .setNumber(pipeline.pipelineNum);
-  }
-  
-  public void prepareForNote() {
-    turnOnLimelight();
-    setLimelightPipeline(IntakePipeline.Note);
+  public void setLimelightPipeline(ShooterPipeline pipeline) {
+    table.getEntry("pipeline").setNumber(pipeline.pipelineNum);
   }
 
+  
   public Double getTX() {
     double tX = table.getEntry("tx").getDouble(0);
     return (tX != 0) ? tX : Double.NaN;

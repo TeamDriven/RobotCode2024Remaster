@@ -7,7 +7,9 @@ package frc.robot;
 import frc.robot.subsystems.limelightIntake.LimelightIntake;
 import frc.robot.subsystems.limelightIntake.LimelightIntakeIO;
 import frc.robot.subsystems.limelightIntake.LimelightIntakeIOLimelight;
-import frc.robot.subsystems.LimelightShooter;
+import frc.robot.subsystems.limelightShooter.LimelightShooter;
+import frc.robot.subsystems.limelightShooter.LimelightShooterIO;
+import frc.robot.subsystems.limelightShooter.LimelightShooterIOLimelight;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.actuation.Actuation;
@@ -47,8 +49,7 @@ public final class Subsystems {
   public static final Indexer indexer; // My indexer
   public static final Climber climber; // My climber
   public static final AngleController angleController; // My angle controller
-  public static final LimelightShooter limelightShooter =
-      new LimelightShooter(); // My limelight for the shooter
+  public static final LimelightShooter limelightShooter; // My limelight for the shooter
   public static final LimelightIntake limelightIntake; // My limelight for the intake
   public static final Slapper slapper; // My slapper
 
@@ -75,6 +76,7 @@ public final class Subsystems {
           slapper = new Slapper(new SlapperIOKraken(20, 5));
           intake = new Intake(new IntakeIOKraken(13, 0, 1));
           limelightIntake = new LimelightIntake(new LimelightIntakeIOLimelight());
+          limelightShooter = new LimelightShooter(new LimelightShooterIOLimelight());
         }
         case DEVBOT -> {
           drive =
@@ -92,6 +94,7 @@ public final class Subsystems {
           slapper = new Slapper(new SlapperIOKraken(20, 5));
           intake = new Intake(new IntakeIOKraken(13, 0, 1));
           limelightIntake = new LimelightIntake(new LimelightIntakeIOLimelight());
+          limelightShooter = new LimelightShooter(new LimelightShooterIOLimelight());
         }
         case SIMBOT -> {
           throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
@@ -116,6 +119,7 @@ public final class Subsystems {
       intake = new Intake(new IntakeIO() {});
       shooter = new Shooter(new ShooterIO() {});
       limelightIntake = new LimelightIntake(new LimelightIntakeIO() {});
+      limelightShooter = new LimelightShooter(new LimelightShooterIO() {});
     }
   }
 }
