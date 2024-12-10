@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /** Drive controller for outputting {@link ChassisSpeeds} from driver joysticks. */
 public class AutoDriveController {
+
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
 
   /**
@@ -22,10 +23,6 @@ public class AutoDriveController {
    * @param robotRelative Robot relative drive
    */
   public void acceptDriveInput(ChassisSpeeds chassisSpeeds) {
-    // System.out.println("ChassisSpeeds:" + chassisSpeeds);
-    // this.chassisSpeeds =
-    //     ChassisSpeeds.fromRobotRelativeSpeeds(
-    //         chassisSpeeds, RobotState.getInstance().getEstimatedPose().getRotation());
     this.chassisSpeeds = chassisSpeeds;
   }
 
@@ -34,7 +31,7 @@ public class AutoDriveController {
    *
    * @return {@link ChassisSpeeds} with driver's requested speeds.
    */
-  public ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds update() {
     return chassisSpeeds;
   }
 }

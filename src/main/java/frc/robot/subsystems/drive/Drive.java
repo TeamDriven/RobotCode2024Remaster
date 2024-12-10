@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
+import frc.robot.subsystems.drive.DriveConstants.ModuleConfig;
 import frc.robot.subsystems.drive.controllers.AutoAlignController;
 import frc.robot.subsystems.drive.controllers.AutoDriveController;
 import frc.robot.subsystems.drive.controllers.HeadingController;
+import frc.robot.subsystems.drive.controllers.SimpleDriveController;
 import frc.robot.subsystems.drive.controllers.TeleopDriveController;
 import frc.robot.util.EqualsUtil;
 import frc.robot.util.LoggedTunableNumber;
@@ -64,7 +66,10 @@ public class Drive extends SubsystemBase {
     CHARACTERIZATION,
 
     /** Running wheel radius characterization routine (spinning in circle) */
-    WHEEL_RADIUS_CHARACTERIZATION
+    WHEEL_RADIUS_CHARACTERIZATION,
+
+    /** Drive output directly to wheels, controlled like teleop */
+    SIMPLE
   }
 
   public enum CoastRequest {
@@ -102,7 +107,7 @@ public class Drive extends SubsystemBase {
   private boolean brakeModeEnabled = true;
 
   @AutoLogOutput(key = "Drive/CoastRequest")
-  private CoastRequest coastRequest = CoastRequest.AUTOMATIC;
+  public CoastRequest coastRequest = CoastRequest.AUTOMATIC;
 
   private boolean lastEnabled = false;
 
@@ -121,6 +126,7 @@ public class Drive extends SubsystemBase {
 
   private final TeleopDriveController teleopDriveController;
   private final AutoDriveController autoDriveController;
+  private final SimpleDriveController simpleDriveController;
   private AutoAlignController autoAlignController = null;
   private HeadingController headingController = null;
 
@@ -137,6 +143,7 @@ public class Drive extends SubsystemBase {
         new SwerveSetpointGenerator(DriveConstants.kinematics, DriveConstants.moduleTranslations);
     teleopDriveController = new TeleopDriveController();
     autoDriveController = new AutoDriveController();
+    simpleDriveController = new SimpleDriveController();
 
     configurePathPlanner();
   }
@@ -237,9 +244,9 @@ public class Drive extends SubsystemBase {
                 Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecThreshold.get())) {
       lastMovementTimer.reset();
     }
-    if (DriverStation.isEnabled() && !lastEnabled) {
-      coastRequest = CoastRequest.AUTOMATIC;
-    }
+    // if (DriverStation.isEnabled() && !lastEnabled) {
+    //   coastRequest = CoastRequest.AUTOMATIC;
+    // }
 
     lastEnabled = DriverStation.isEnabled();
     switch (coastRequest) {
@@ -271,7 +278,7 @@ public class Drive extends SubsystemBase {
       }
       case AUTO -> {
         // Run auto drive with drive input
-        desiredSpeeds = autoDriveController.getChassisSpeeds();
+        desiredSpeeds = autoDriveController.update();
       }
       case AUTO_ALIGN -> {
         // Run auto align with drive input
@@ -285,6 +292,9 @@ public class Drive extends SubsystemBase {
       }
       case WHEEL_RADIUS_CHARACTERIZATION -> {
         desiredSpeeds = new ChassisSpeeds(0, 0, characterizationInput);
+      }
+      case SIMPLE -> {
+        desiredSpeeds = simpleDriveController.update();
       }
       default -> {}
     }
@@ -312,6 +322,10 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("Drive/SwerveStates/Torques", optimizedSetpointTorques);
     }
 
+    if (DriveConstants.shouldPrintZeros) {
+      printZeros();
+    }
+
     // Log chassis speeds and swerve states
     Logger.recordOutput(
         "Drive/SwerveStates/Desired(b4 Poofs)",
@@ -327,7 +341,7 @@ public class Drive extends SubsystemBase {
         () -> RobotState.getInstance().getEstimatedPose(), // Supplier of current robot pose
         (pose2D) ->
             RobotState.getInstance().resetPose(pose2D), // Consumer for seeding pose against auto
-        () -> autoDriveController.getChassisSpeeds(), // Supplier of ChassisSpeeds for the robot
+        () -> autoDriveController.update(), // Supplier of ChassisSpeeds for the robot
         (speeds) -> acceptAutoInput(speeds), // Consumer of ChassisSpeeds to drive the robot
         getPathFollowerConfig(),
         () -> false,
@@ -397,6 +411,15 @@ public class Drive extends SubsystemBase {
       currentDriveMode = DriveMode.AUTO;
       autoDriveController.acceptDriveInput(chassisSpeeds);
     }
+  }
+
+  public void acceptSimpleInput(double x, double y, double omega, boolean robotRelative) {
+    currentDriveMode = DriveMode.SIMPLE;
+    simpleDriveController.acceptDriveInput(x, y, omega, robotRelative);
+  }
+
+  public ChassisSpeeds getSimpleSpeeds() {
+    return simpleDriveController.update();
   }
 
   public void clearAutoInput() {
@@ -518,16 +541,43 @@ public class Drive extends SubsystemBase {
         .withName("Orient Modules");
   }
 
+  public void printZeros() {
+    ModuleConfig[] configs = DriveConstants.moduleConfigs;
+    Rotation2d[] rots = getAbsoluteModuleRotations();
+    for (int i = 0; i < configs.length; i++) {
+      System.out.printf(
+          "new ModuleConfig(%d, %d, %d, new Rotation2d(%f), %b)",
+          configs[i].driveID(),
+          configs[i].turnID(),
+          configs[i].absoluteEncoderChannel(),
+          rots[i].getRadians(),
+          configs[i].turnMotorInverted());
+      if (i == configs.length - 1) {
+        System.out.println();
+      } else {
+        System.out.println(",");
+      }
+    }
+  }
+
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "Drive/SwerveStates/Measured")
-  private SwerveModuleState[] getModuleStates() {
+  public SwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules).map(Module::getState).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the measured speeds of the robot in the robot's frame of reference. */
   @AutoLogOutput(key = "Drive/MeasuredSpeeds")
-  private ChassisSpeeds getSpeeds() {
+  public ChassisSpeeds getSpeeds() {
     return DriveConstants.kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  public Rotation2d[] getAbsoluteModuleRotations() {
+    Rotation2d[] rots = new Rotation2d[modules.length];
+    for (int i = 0; i < modules.length; i++) {
+      rots[i] = modules[i].getAngle().plus(DriveConstants.moduleConfigs[i].absoluteEncoderOffset());
+    }
+    return rots;
   }
 
   public static Rotation2d[] getStraightOrientations() {
