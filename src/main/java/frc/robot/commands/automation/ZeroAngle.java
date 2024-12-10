@@ -31,7 +31,7 @@ public class ZeroAngle extends SequentialCommandGroup {
         // actuation.resetEncoderCommand(),
         new InstantCommand(
             () -> angleController.setPosition(AngleControllerConstants.restingPosition)),
-        new InstantCommand(shooter::sitMode));
+        new InstantCommand(shooter::stopMotors));
   }
 
   public ZeroAngle(double angleRestingPosition) {
@@ -48,6 +48,6 @@ public class ZeroAngle extends SequentialCommandGroup {
         // actuation.resetEncoderCommand(),
         new InstantCommand(
             () -> angleController.setPosition(AngleControllerConstants.restingPosition)),
-        new InstantCommand(shooter::sitMode));
+        new InstantCommand(shooter::stopMotors));
   }
 }
