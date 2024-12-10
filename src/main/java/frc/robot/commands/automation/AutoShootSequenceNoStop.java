@@ -1,13 +1,14 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
-import static frc.robot.Constants.IndexerConstants.*;
-import static frc.robot.Constants.IntakeConstants.*;
-import static frc.robot.Constants.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.actuation.Actuation.position;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -27,19 +28,19 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
       double restingAngle,
       DoubleSupplier slapperAngle) {
     addCommands(
-        angleController.setPositionCommandSupplier(angle),
-        slapper.setPositionCommand(slapperAngle),
-        shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
-        angleController.waitUntilAtPositionSupplier(angle),
-        shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
-        indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
-        shooter.checkIfAtSpeedSupplier(velocity),
-        indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-        actuation.waitUntilAtPosition(actuationTuckPosition),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
+        new InstantCommand(() -> shooter.runShooter(velocity.getAsDouble(), shooterSequenceAcceleration)),
+        angleController.waitUntilAtPosition(),
+        shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.8),
+        new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
+        shooter.checkIfAtSpeed(velocity.getAsDouble()),
+        indexer.checkIfAtSpeed(() -> indexerVelocity),
+        actuation.waitUntilAtPosition(),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
-        intake.stopIntakeCommand(),
-        actuation.setPositionCommand(restingAngle));
+        new InstantCommand(() -> intake.stopMotor()),
+        new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 
   public AutoShootSequenceNoStop(
@@ -49,18 +50,18 @@ public class AutoShootSequenceNoStop extends SequentialCommandGroup {
       double indexerVelocity,
       DoubleSupplier slapperAngle) {
     addCommands(
-        angleController.setPositionCommandSupplier(angle),
-        slapper.setPositionCommand(slapperAngle),
-        shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
-        angleController.waitUntilAtPositionSupplier(angle),
-        shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
-        indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
-        shooter.checkIfAtSpeedSupplier(velocity),
-        indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-        actuation.waitUntilAtPosition(actuationTuckPosition),
-        intake.startFeedingCommand(feedVelocity, feedAcceleration),
+        new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+        new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
+        new InstantCommand(() -> shooter.runShooterSlow(velocity.getAsDouble(), shooterSequenceAcceleration)),
+        angleController.waitUntilAtPosition(),
+        shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.8),
+        new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
+        shooter.checkIfAtSpeed(velocity.getAsDouble()),
+        indexer.checkIfAtSpeed(() -> indexerVelocity),
+        actuation.waitUntilAtPosition(),
+        new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
         new WaitCommand(0.5).raceWith(shooter.waitUntilRingLeft()),
-        intake.stopIntakeCommand(),
-        actuation.setPositionCommand(restingAngle));
+        new InstantCommand(() -> intake.stopMotor()),
+        new InstantCommand(() -> actuation.setPosition(position.TUCK)));
   }
 }

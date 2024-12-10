@@ -8,14 +8,13 @@
 package frc.robot;
 
 import static frc.robot.Constants.*;
-import static frc.robot.Constants.AngleControllerConstants.*;
-import static frc.robot.Constants.IndexerConstants.*;
-import static frc.robot.Constants.IntakeConstants.*;
-import static frc.robot.Constants.ShooterConstants.*;
-import static frc.robot.Constants.SlapperConstants.*;
-import static frc.robot.Constants.TurningConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+import static frc.robot.subsystems.slapper.SlapperConstants.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -35,12 +34,16 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
+import frc.robot.commands.drivetrain.ResetDrive;
+import frc.robot.subsystems.angleController.AngleControllerConstants;
+import frc.robot.subsystems.slapper.SlapperConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
@@ -75,50 +78,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Create subsystems
-    if (Constants.getMode() != Constants.Mode.REPLAY) {
-      switch (Constants.getRobot()) {
-        case COMPBOT -> {
-          drive =
-              new Drive(
-                  new GyroIOPigeon2(true),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
-        }
-        case DEVBOT -> {
-          drive =
-              new Drive(
-                  new GyroIOPigeon2(false),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
-        }
-        case SIMBOT -> {
-          drive =
-              new Drive(
-                  new GyroIO() {},
-                  new ModuleIOSim(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOSim(DriveConstants.moduleConfigs[3]));
-        }
-      }
-    }
-
-    // No-op implementation for replay
-    if (drive == null) {
-      drive =
-          new Drive(
-              new GyroIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {});
-    }
-
     // Configure autos and buttons
     linkAutoCommands();
     configureButtonBindings(false);
@@ -179,7 +138,7 @@ public class RobotContainer {
         new AutoShootSequence(
             () -> 19.5,
             () -> 45,
-            angleRestingPosition,
+            AngleControllerConstants.restingPosition,
             () -> slapperRestingPosition,
             slapperRestingPosition));
 
@@ -200,7 +159,7 @@ public class RobotContainer {
         new AutoShootSequence(
             () -> 19.5,
             () -> 45,
-            angleRestingPosition,
+            AngleControllerConstants.restingPosition,
             () -> slapperRestingPosition,
             slapperRestingPosition));
 
@@ -238,29 +197,33 @@ public class RobotContainer {
 
     new Trigger(() -> !isIntaking).onTrue(new StopIntake());
 
-    climberUp.whileTrue(climber.runLimitedVoltageCommand(12));
+    climberUp.whileTrue(new InstantCommand(() -> climber.runVoltage(12)));
 
-    climberDown.whileTrue(climber.runLimitedVoltageCommand(-12));
+    climberDown.whileTrue(new InstantCommand(() -> climber.runVoltage(-12)));
 
     // driver.y().whileTrue(slapper.runVoltageCommand(-0.1));
     // driver.a().whileTrue(slapper.runVoltageCommand(0.1));
 
     manualOut
-        .whileTrue(new ParallelCommandGroup(intake.runVoltageCommand(-4)))
-        // indexer.runIndexerCommand(-indexerVelocity, indexerAcceleration)))
-        .onFalse(intake.stopIntakeCommand());
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.runVoltage(-4)),
+                new InstantCommand(
+                    () -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
+        .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     manualIn
-        .whileTrue(new ParallelCommandGroup(intake.runVoltageCommand(4)))
-        // indexer.runIndexerCommand(indexerVelocity, indexerAcceleration)))
-        .onFalse(intake.stopIntakeCommand());
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.runVoltage(4)),
+                new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration))))
+        .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     // On Stop Shooting
     // new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
     //     .onTrue(
     //         new StopShoot(
-    //             AngleControllerConstants.angleRestingPosition,
-    //             SlapperConstants.slapperRestingPosition));
+    //             AngleControllerConstants.restingPosition, SlapperConstants.slapperRestingPosition));
 
     // subwooferShot.onTrue(
     //     new ConditionalCommand(
@@ -281,7 +244,7 @@ public class RobotContainer {
     //         new AutoShootSequence(
     //                 () -> subwooferShotAngle,
     //                 () -> subwooferShotSpeed,
-    //                 angleRestingPosition,
+    //                 AngleControllerConstants.restingPosition,
     //                 () -> slapperRestingPosition,
     //                 slapperRestingPosition)
     //             .andThen(new InstantCommand(this::stopShooting)));
@@ -308,7 +271,7 @@ public class RobotContainer {
     //             new AutoShootSequence(
     //                 () -> podiumShotAngle,
     //                 () -> podiumShotAngle,
-    //                 angleRestingPosition,
+    //                 AngleControllerConstants.restingPosition,
     //                 () -> slapperRestingPosition,
     //                 slapperRestingPosition),
     //             new InstantCommand(this::stopShooting),
@@ -335,7 +298,7 @@ public class RobotContainer {
     //             new AutoShootSequence(
     //                 () -> passShotAngle,
     //                 () -> passShotSpeed,
-    //                 angleRestingPosition,
+    //                 AngleControllerConstants.restingPosition,
     //                 () -> slapperRestingPosition,
     //                 slapperRestingPosition),
     //             new InstantCommand(this::stopShooting),
@@ -352,8 +315,8 @@ public class RobotContainer {
     //     .onTrue(
     //         new ParallelCommandGroup(
     //             new InstantCommand(() -> drive.setHeadingGoal(() -> Rotation2d.fromDegrees(90))),
-    //             angleController.setPositionCommandSupplier(() -> ampAngle),
-    //             slapper.setPositionCommand(slapperAmpPosition)))
+    //             new InstantCommand(() -> angleController.setPosition(ampAngle)),
+    //             new InstantCommand(() -> slapper.setPosition(slapperAmpPosition))))
     //     .onFalse(new InstantCommand(() -> drive.clearHeadingGoal()));
 
     // new Trigger(() -> currentShootingType.equals(shootingType.AMP))
@@ -363,16 +326,17 @@ public class RobotContainer {
     //             new AutoShootSequence(
     //                     () -> ampAngle,
     //                     () -> ampSpeed,
-    //                     angleRestingPosition,
+    //                     AngleControllerConstants.restingPosition,
     //                     () -> slapperAmpPosition,
     //                     slapperPushNotePosition)
     //                 .andThen(
     //                     new SequentialCommandGroup(
-    //                             slapper.setPositionCommand(slapperPostAmpPosition),
+    //                             new InstantCommand(
+    //                                 () -> slapper.setPosition(slapperPostAmpPosition)),
     //                             new WaitCommand(0.75),
     //                             new InstantCommand(this::stopShooting))
     //                         .beforeStarting(
-    //                             slapper.waitUntilAtPosition(slapperPushNotePosition)))));
+    //                             new InstantCommand(() -> slapper.waitUntilAtPosition())))));
 
     // cancelShot.onTrue(new InstantCommand(this::stopShooting));
   }

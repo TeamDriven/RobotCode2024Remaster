@@ -1,12 +1,13 @@
 package frc.robot.commands.automation;
 
-import static frc.robot.Constants.ActuationConstants.*;
-import static frc.robot.Constants.IndexerConstants.*;
-import static frc.robot.Constants.IntakeConstants.*;
-import static frc.robot.Constants.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Subsystems.*;
+import static frc.robot.subsystems.indexer.IndexerConstants.indexerAcceleration;
+import static frc.robot.subsystems.indexer.IndexerConstants.indexerVelocity;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.ShakeController;
@@ -29,15 +30,15 @@ public class ShootSequence extends ConditionalCommand {
   public ShootSequence(DoubleSupplier angle, DoubleSupplier velocity, DoubleSupplier slapperAngle) {
     super(
         new SequentialCommandGroup(
-            angleController.setPositionCommandSupplier(angle),
-            slapper.setPositionCommand(slapperAngle),
-            shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
-            angleController.waitUntilAtPositionSupplier(angle),
-            shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.8),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
-            shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-            intake.feedCommand(feedVelocity, feedAcceleration)),
+            new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
+            new InstantCommand(() -> shooter.runShooter(velocity.getAsDouble(), shooterSequenceAcceleration)),
+            angleController.waitUntilAtPosition(),
+            shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.8),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
+            shooter.checkIfAtSpeed(velocity.getAsDouble()),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration))),
         new ShakeController(1.0, 1.0),
         () ->
             !(((Double) angle.getAsDouble()).equals(Double.NaN))
@@ -58,16 +59,16 @@ public class ShootSequence extends ConditionalCommand {
       double slapperRestingPosition) {
     super(
         new SequentialCommandGroup(
-            angleController.setPositionCommandSupplier(angle),
-            slapper.setPositionCommand(slapperAngle),
-            shooter.speedUpShooter(velocity, shooterSequenceAcceleration),
-            angleController.waitUntilAtPositionSupplier(angle),
-            shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
-            shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-            actuation.waitUntilAtPosition(actuationTuckPosition),
-            intake.startFeedingCommand(feedVelocity, feedAcceleration),
+            new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
+            new InstantCommand(() -> shooter.runShooter(velocity.getAsDouble(), shooterSequenceAcceleration)),
+            angleController.waitUntilAtPosition(),
+            shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.75),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
+            shooter.checkIfAtSpeed(velocity.getAsDouble()),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
+            actuation.waitUntilAtPosition(),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
             new WaitCommand(1.0),
             new StopShoot(restingAngle, slapperRestingPosition)),
         new ShakeController(1.0, 1.0),
@@ -85,16 +86,16 @@ public class ShootSequence extends ConditionalCommand {
       double slapperRestingPosition) {
     super(
         new SequentialCommandGroup(
-            angleController.setPositionCommandSupplier(angle),
-            slapper.setPositionCommand(slapperAngle),
-            shooter.speedUpShooterSlow(velocity, shooterSequenceAcceleration),
-            angleController.waitUntilAtPositionSupplier(angle),
-            shooter.checkIfAtSpeedSupplier(() -> velocity.getAsDouble() * 0.75),
-            indexer.speedUpIndexer(indexerVelocity, indexerAcceleration),
-            shooter.checkIfAtSpeedSupplier(velocity),
-            indexer.checkIfAtSpeedSupplier(() -> indexerVelocity),
-            actuation.waitUntilAtPosition(actuationTuckPosition),
-            intake.startFeedingCommand(feedVelocity, feedAcceleration),
+            new InstantCommand(() -> angleController.setPosition(angle.getAsDouble())),
+            new InstantCommand(() -> slapper.setPosition(slapperAngle.getAsDouble())),
+            new InstantCommand(() -> shooter.runShooterSlow(velocity.getAsDouble(), shooterSequenceAcceleration)),
+            angleController.waitUntilAtPosition(),
+            shooter.checkIfAtSpeed(velocity.getAsDouble() * 0.75),
+            new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration)),
+            shooter.checkIfAtSpeed(velocity.getAsDouble()),
+            indexer.checkIfAtSpeed(() -> indexerVelocity),
+            actuation.waitUntilAtPosition(),
+            new InstantCommand(() -> intake.feedMotor(feedVelocity, feedAcceleration)),
             new WaitCommand(1.0),
             // shooter.waitUntilRingLeft(),
             new StopShoot(restingAngle, slapperRestingPosition)),

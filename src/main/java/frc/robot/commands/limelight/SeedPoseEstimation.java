@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotState;
+import frc.robot.subsystems.limelightShooter.LimelightShooterIOLimelight;
+
 import org.littletonrobotics.junction.Logger;
 
 public class SeedPoseEstimation extends Command {
@@ -36,7 +38,7 @@ public class SeedPoseEstimation extends Command {
     boolean rejectFrontLLUpdate = false;
 
     LimelightHelpers.SetRobotOrientation(
-        limelightShooter.LIMELIGHT,
+        LimelightShooterIOLimelight.LIMELIGHT,
         rot.getDegrees(),
         RobotState.getInstance().fieldVelocity().dtheta,
         0,
@@ -46,7 +48,7 @@ public class SeedPoseEstimation extends Command {
     // LimelightHelpers.SetRobotOrientation(limelightShooter.LIMELIGHT, rot.getDegrees(), 0, 0, 0,
     // 0, 0);
     LimelightHelpers.PoseEstimate poseEstimate_FrontLL =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightShooter.LIMELIGHT);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightShooterIOLimelight.LIMELIGHT);
 
     if (RobotState.getInstance().fieldVelocity().dtheta
         > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision
