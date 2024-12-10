@@ -32,9 +32,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.SlippageCalculator;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
@@ -465,16 +465,16 @@ public class RobotContainer {
     //     .withName("Drive Wheel Radius Characterization");
 
     // Slippage Calculator
-    return Commands.runOnce(
-            () ->
-                robotState.resetPose(
-                    new Pose2d(
-                        // robotState.getEstimatedPose().getTranslation(),
-                        new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
-        .andThen(new SlippageCalculator(drive))
-        .withName("Slippage Calculator");
+    // return Commands.runOnce(
+    //         () ->
+    //             robotState.resetPose(
+    //                 new Pose2d(
+    //                     // robotState.getEstimatedPose().getTranslation(),
+    //                     new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
+    //     .andThen(new SlippageCalculator(drive))
+    //     .withName("Slippage Calculator");
 
-    // return drive.getAutoPath("TestAuto");
+    return new RepeatCommand(drive.getAutoPath("TestAuto"));
     // return autoChooser.getSelected();
   }
 }
