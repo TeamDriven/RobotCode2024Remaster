@@ -20,6 +20,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.subsystems.drive.DriveConstants.ModuleConfig;
 import java.util.Queue;
 import java.util.concurrent.Executor;
@@ -34,18 +38,18 @@ public class ModuleIOKrakenFOC implements ModuleIO {
   private final Rotation2d absoluteEncoderOffset;
 
   // Status Signals
-  private final StatusSignal<Double> drivePosition;
-  private final StatusSignal<Double> driveVelocity;
-  private final StatusSignal<Double> driveAppliedVolts;
-  private final StatusSignal<Double> driveSupplyCurrent;
-  private final StatusSignal<Double> driveTorqueCurrent;
+  private final StatusSignal<Angle> drivePosition;
+  private final StatusSignal<AngularVelocity> driveVelocity;
+  private final StatusSignal<Voltage> driveAppliedVolts;
+  private final StatusSignal<Current> driveSupplyCurrent;
+  private final StatusSignal<Current> driveTorqueCurrent;
 
-  private final StatusSignal<Double> turnPosition;
+  private final StatusSignal<Angle> turnPosition;
   private final Supplier<Rotation2d> turnAbsolutePosition;
-  private final StatusSignal<Double> turnVelocity;
-  private final StatusSignal<Double> turnAppliedVolts;
-  private final StatusSignal<Double> turnSupplyCurrent;
-  private final StatusSignal<Double> turnTorqueCurrent;
+  private final StatusSignal<AngularVelocity> turnVelocity;
+  private final StatusSignal<Voltage> turnAppliedVolts;
+  private final StatusSignal<Current> turnSupplyCurrent;
+  private final StatusSignal<Current> turnTorqueCurrent;
 
   // Odometry Queues
   private final Queue<Double> drivePositionQueue;
@@ -98,7 +102,7 @@ public class ModuleIOKrakenFOC implements ModuleIO {
       error = error && (turnTalon.getConfigurator().apply(turnTalonConfig, 0.1) == StatusCode.OK);
       if (!error) break;
     }
-
+    
     // 250hz signals
     drivePosition = driveTalon.getPosition();
     turnPosition = turnTalon.getPosition();
@@ -137,8 +141,8 @@ public class ModuleIOKrakenFOC implements ModuleIO {
     turnTalon.setPosition(turnAbsolutePosition.get().getRotations(), 1.0);
 
     // Optimize bus utilization
-    driveTalon.optimizeBusUtilization(1.0);
-    turnTalon.optimizeBusUtilization(1.0);
+    driveTalon.optimizeBusUtilization(0, 1.0);
+    turnTalon.optimizeBusUtilization(0, 1.0);
   }
 
   @Override

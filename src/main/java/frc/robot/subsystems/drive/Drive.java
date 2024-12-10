@@ -7,13 +7,7 @@
 
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.path.PathPlannerTrajectory.State;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -93,7 +87,7 @@ public class Drive extends SubsystemBase {
   private final Module[] modules = new Module[4];
 
   // Store previous positions and time for filtering odometry data
-  private SwerveDriveWheelPositions lastPositions = null;
+  private SwerveModulePosition[] lastPositions = null;
   private double lastTime = 0.0;
 
   /** Active drive mode. */
@@ -145,7 +139,7 @@ public class Drive extends SubsystemBase {
     autoDriveController = new AutoDriveController();
     simpleDriveController = new SimpleDriveController();
 
-    configurePathPlanner();
+    // configurePathPlanner();
   }
 
   public void periodic() {
@@ -187,22 +181,22 @@ public class Drive extends SubsystemBase {
       Rotation2d yaw = gyroInputs.connected ? gyroInputs.odometryYawPositions[i] : null;
       // Get all four swerve module positions at that odometry update
       // and store in SwerveDriveWheelPositions object
-      SwerveDriveWheelPositions wheelPositions =
-          new SwerveDriveWheelPositions(
+      SwerveModulePosition[] wheelPositions =
+          
               Arrays.stream(modules)
                   .map(module -> module.getModulePositions()[odometryIndex])
-                  .toArray(SwerveModulePosition[]::new));
+                  .toArray(SwerveModulePosition[]::new);
       // Filtering based on delta wheel positions
       boolean includeMeasurement = true;
       if (lastPositions != null) {
         double dt = odometryTimestampInputs.timestamps[i] - lastTime;
         for (int j = 0; j < modules.length; j++) {
           double velocity =
-              (wheelPositions.positions[j].distanceMeters
-                      - lastPositions.positions[j].distanceMeters)
+              (wheelPositions[j].distanceMeters
+                      - lastPositions[j].distanceMeters)
                   / dt;
           double omega =
-              wheelPositions.positions[j].angle.minus(lastPositions.positions[j].angle).getRadians()
+              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
                   / dt;
           // Check if delta is too large
           if (Math.abs(omega) > currentModuleLimits.maxSteeringVelocity() * 5.0
@@ -336,26 +330,26 @@ public class Drive extends SubsystemBase {
   }
 
   /** Configure the path planner for the swerve drivetrain */
-  private void configurePathPlanner() {
-    AutoBuilder.configureHolonomic(
-        () -> RobotState.getInstance().getEstimatedPose(), // Supplier of current robot pose
-        (pose2D) ->
-            RobotState.getInstance().resetPose(pose2D), // Consumer for seeding pose against auto
-        () -> autoDriveController.update(), // Supplier of ChassisSpeeds for the robot
-        (speeds) -> acceptAutoInput(speeds), // Consumer of ChassisSpeeds to drive the robot
-        getPathFollowerConfig(),
-        () -> false,
-        this); // Subsystem for requirements
-  }
+  // private void configurePathPlanner() {
+  //   AutoBuilder.configureHolonomic(
+  //       () -> RobotState.getInstance().getEstimatedPose(), // Supplier of current robot pose
+  //       (pose2D) ->
+  //           RobotState.getInstance().resetPose(pose2D), // Consumer for seeding pose against auto
+  //       () -> autoDriveController.update(), // Supplier of ChassisSpeeds for the robot
+  //       (speeds) -> acceptAutoInput(speeds), // Consumer of ChassisSpeeds to drive the robot
+  //       getPathFollowerConfig(),
+  //       () -> false,
+  //       this); // Subsystem for requirements
+  // }
 
-  public HolonomicPathFollowerConfig getPathFollowerConfig() {
-    return new HolonomicPathFollowerConfig(
-        new PIDConstants(2, 0, 0),
-        new PIDConstants(2, 0, 0),
-        DriveConstants.moduleLimitsFree.maxDriveVelocity(),
-        DriveConstants.driveConfig.driveBaseRadius(),
-        new ReplanningConfig());
-  }
+  // public HolonomicPathFollowerConfig getPathFollowerConfig() {
+  //   return new HolonomicPathFollowerConfig(
+  //       new PIDConstants(2, 0, 0),
+  //       new PIDConstants(2, 0, 0),
+  //       DriveConstants.moduleLimitsFree.maxDriveVelocity(),
+  //       DriveConstants.driveConfig.driveBaseRadius(),
+  //       new ReplanningConfig());
+  // }
 
   /**
    * Get an auto based off of the name
@@ -363,35 +357,9 @@ public class Drive extends SubsystemBase {
    * @param pathName the name of the path
    * @return a command that will run the path
    */
-  public Command getAutoPath(String pathName) {
-    return new PathPlannerAuto(pathName);
-  }
-
-  /**
-   * Get the end state of a path
-   *
-   * @param autoName the name of the auto to grab from
-   * @param index the index of the path in that auto
-   * @return the end state of the path
-   */
-  public State getEndPath(String autoName, int index) {
-    var pathGroup = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
-    var path = pathGroup.get(index);
-
-    ChassisSpeeds startingChassisSpeed = new ChassisSpeeds(0, 0, 0);
-    Rotation2d rot;
-
-    try {
-      var previousPath = pathGroup.get(index - 1);
-      var startingState = previousPath.getGoalEndState();
-      rot = startingState.getRotation();
-    } catch (IndexOutOfBoundsException e) {
-      rot = RobotState.getInstance().getEstimatedPose().getRotation();
-    }
-
-    var trajectory = new PathPlannerTrajectory(path, startingChassisSpeed, rot);
-    return trajectory.getEndState();
-  }
+  // public Command getAutoPath(String pathName) {
+  //   return new PathPlannerAuto(pathName);
+  // }
 
   /** Pass controller input into teleopDriveController in field relative input */
   public void acceptTeleopInput(

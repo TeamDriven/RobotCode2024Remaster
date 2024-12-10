@@ -27,7 +27,6 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOKrakenFOC;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerIOKraken;
@@ -82,10 +81,10 @@ public final class Subsystems {
           drive =
               new Drive(
                   new GyroIOPigeon2(false),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[0]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[1]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[2]),
-                  new ModuleIOSparkMax(DriveConstants.moduleConfigs[3]));
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[0]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
+                  new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
           actuation = new Actuation(new ActuationIOFalcon500(14, 6));
           shooter = new Shooter(new ShooterIOKraken(15, 16));
           climber = new Climber(new ClimberIOKraken(18));

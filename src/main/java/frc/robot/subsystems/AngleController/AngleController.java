@@ -4,7 +4,6 @@ import static frc.robot.subsystems.angleController.AngleControllerConstants.rota
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.AngleController.AngleControllerIOInputsAutoLogged;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -25,11 +24,12 @@ public class AngleController extends SubsystemBase {
     angleControllerIO.updateInputs(angleControllerInputs);
     Logger.processInputs("AngleController", angleControllerInputs);
 
-    if (position != angleControllerIO.getPosition()) {
-      angleControllerIO.stopMotor();
-    } else {
-      angleControllerIO.setPosition(position);
-    }
+    // if (position != angleControllerInputs.motorPosition) {
+    //   angleControllerIO.stopMotor();
+    // } else {
+    //   angleControllerIO.setPosition(position);
+    // }
+    angleControllerIO.stopMotor();
   }
 
   public Command waitUntilAtPosition() {
@@ -38,7 +38,7 @@ public class AngleController extends SubsystemBase {
       public boolean isFinished() {
         return Math.abs(
                 angleControllerInputs.motorPosition * rotationsPerDegree
-                    - angleControllerIO.getPosition() * rotationsPerDegree)
+                    - angleControllerInputs.motorPosition * rotationsPerDegree)
             <= 0.1;
       }
     };
@@ -48,7 +48,7 @@ public class AngleController extends SubsystemBase {
     return new Command() {
       @Override
       public boolean isFinished() {
-        return angleControllerIO.getSensor();
+        return angleControllerInputs.sensorIsTripped;
       }
     };
   }

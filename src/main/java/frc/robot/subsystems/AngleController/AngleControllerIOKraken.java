@@ -25,7 +25,7 @@ public class AngleControllerIOKraken implements AngleControllerIO {
 
     zeroSensor = new DigitalInput(sensorID);
 
-    motionMagicControl = new MotionMagicVoltage(0, false, -0.1, 0, false, false, false);
+    motionMagicControl = new MotionMagicVoltage(0);
     stopMode = new NeutralOut();
 
     resetEncoder();
@@ -75,19 +75,11 @@ public class AngleControllerIOKraken implements AngleControllerIO {
 
   public void setPosition(double position) {
     AngleControllerMotor.setControl(
-        motionMagicControl.withPosition(position * AngleControllerConstants.rotationsPerDegree));
-  }
-
-  public double getPosition() {
-    return AngleControllerMotor.getPosition().getValueAsDouble();
+        motionMagicControl.withPosition(position * AngleControllerConstants.rotationsPerDegree).withFeedForward(-0.1).withSlot(0));
   }
 
   public void stopMotor() {
     AngleControllerMotor.setControl(stopMode);
-  }
-
-  public boolean getSensor() {
-    return !zeroSensor.get();
   }
 
   public void setOnSensor() {

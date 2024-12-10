@@ -17,7 +17,7 @@ public class ClimberIOKraken implements ClimberIO {
   public ClimberIOKraken(int motorID) {
     climberMotor = new TalonFX(motorID);
 
-    voltageControl = new VoltageOut(0.0, true, false, false, false);
+    voltageControl = new VoltageOut(0.0);
     StopMode = new NeutralOut();
 
     resetClimber();
@@ -71,7 +71,7 @@ public class ClimberIOKraken implements ClimberIO {
   }
 
   public void runUnsafeVoltage(double voltage) {
-    climberMotor.setControl(voltageControl.withOutput(voltage));
+    climberMotor.setControl(voltageControl.withOutput(voltage).withEnableFOC(true));
   }
 
   public void stopMotor() {

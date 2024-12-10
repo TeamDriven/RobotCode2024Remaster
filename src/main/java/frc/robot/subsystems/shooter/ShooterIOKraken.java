@@ -57,14 +57,11 @@ public class ShooterIOKraken implements ShooterIO {
     leftShooterMotor = new TalonFX(lMotorID);
     rightShooterMotor = new TalonFX(rMotorID);
 
-    velocityControl = new VelocityVoltage(0, 0, true, 0.85, 0, false, false, true);
+    velocityControl = new VelocityVoltage(0);
 
-    slowVelocityControl =
-        new VelocityVoltage(
-            0, 0, true, 0.5, // 0.5
-            1, false, false, true);
+    slowVelocityControl = new VelocityVoltage(0);
 
-    sitControl = new VoltageOut(2, false, false, false, true);
+    sitControl = new VoltageOut(2);
 
     stopMode = new NeutralOut();
 
@@ -131,8 +128,8 @@ public class ShooterIOKraken implements ShooterIO {
   }
 
   public void sitMode() {
-    leftShooterMotor.setControl(sitControl.withOutput(1.5));
-    rightShooterMotor.setControl(sitControl.withOutput(1.5));
+    leftShooterMotor.setControl(sitControl.withOutput(1.5).withLimitReverseMotion(true));
+    rightShooterMotor.setControl(sitControl.withOutput(1.5).withLimitReverseMotion(true));
     // leftShooterMotor.setControl(stopMode);
     // rightShooterMotor.setControl(stopMode);
   }
@@ -144,18 +141,18 @@ public class ShooterIOKraken implements ShooterIO {
 
   public void runShooter(double velocity, double acceleration) {
     leftShooterMotor.setControl(
-        velocityControl.withVelocity(velocity).withAcceleration(acceleration));
+        velocityControl.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.85).withSlot(0).withLimitReverseMotion(true));
 
     rightShooterMotor.setControl(
-        velocityControl.withVelocity(velocity).withAcceleration(acceleration));
+        velocityControl.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.85).withSlot(0).withLimitReverseMotion(true));
   }
 
   public void runShooterSlow(double velocity, double acceleration) {
     leftShooterMotor.setControl(
-        slowVelocityControl.withVelocity(velocity).withAcceleration(acceleration));
+        slowVelocityControl.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.5).withSlot(1).withLimitReverseMotion(true));
 
     rightShooterMotor.setControl(
-        slowVelocityControl.withVelocity(velocity).withAcceleration(acceleration));
+        slowVelocityControl.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.5).withSlot(1).withLimitReverseMotion(true));
   }
 
   public boolean getNoteSensor() {

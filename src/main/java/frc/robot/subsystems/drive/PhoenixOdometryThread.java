@@ -11,6 +11,8 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.ParentDevice;
+
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -48,7 +50,7 @@ public class PhoenixOdometryThread extends Thread {
     start();
   }
 
-  public Queue<Double> registerSignal(ParentDevice device, StatusSignal<Double> signal) {
+  public Queue<Double> registerSignal(ParentDevice device, StatusSignal<Angle> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     signalsLock.lock();
     Drive.odometryLock.lock();

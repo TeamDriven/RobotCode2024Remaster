@@ -26,9 +26,10 @@ public class IntakeIOKraken implements IntakeIO {
     rightNoteSensor = new DigitalInput(rightSensorID);
     leftNoteSensor = new DigitalInput(leftSensorID);
 
-    velocityControlFeed = new VelocityVoltage(0, 0, true, 0.5, 1, false, false, false);
+    // velocityControlFeed = new VelocityVoltage(0, 0, true, 0.5, 1, false, false, false);
+    velocityControlFeed = new VelocityVoltage(0);
 
-    voltageControl = new VoltageOut(0, false, false, false, false);
+    voltageControl = new VoltageOut(0);
 
     stopMode = new NeutralOut();
 
@@ -78,7 +79,7 @@ public class IntakeIOKraken implements IntakeIO {
 
   public void feedMotor(double velocity, double acceleration) {
     intakeMotor.setControl(
-        velocityControlFeed.withVelocity(velocity).withAcceleration(acceleration));
+        velocityControlFeed.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.5).withSlot(1));
   }
 
   public void stopMotor() {

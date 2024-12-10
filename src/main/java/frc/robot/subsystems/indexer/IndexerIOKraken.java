@@ -17,7 +17,7 @@ public class IndexerIOKraken implements IndexerIO {
   public IndexerIOKraken(int motorID) {
     indexerMotor = new TalonFX(motorID);
 
-    velocityControl = new VelocityVoltage(0, 0, true, 0.6, 0, false, false, false);
+    velocityControl = new VelocityVoltage(0);
 
     stopMode = new NeutralOut();
 
@@ -57,7 +57,7 @@ public class IndexerIOKraken implements IndexerIO {
   }
 
   public void runIndexer(double velocity, double acceleration) {
-    indexerMotor.setControl(velocityControl.withVelocity(velocity).withAcceleration(acceleration));
+    indexerMotor.setControl(velocityControl.withVelocity(velocity).withAcceleration(acceleration).withEnableFOC(true).withFeedForward(0.6).withSlot(0));
   }
 
   public void stopMotor() {

@@ -11,7 +11,6 @@ import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -23,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
   public record OdometryObservation(
-      SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {}
+    SwerveModulePosition[] wheelPositions, Rotation2d gyroAngle, double timestamp) {}
 
   public record VisionObservation(Pose2d visionPose, double timestamp) {}
 
@@ -44,14 +43,13 @@ public class RobotState {
   private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
   // Odometry
   private final SwerveDriveKinematics kinematics;
-  private SwerveDriveWheelPositions lastWheelPositions =
-      new SwerveDriveWheelPositions(
+  private SwerveModulePosition[] lastWheelPositions =
           new SwerveModulePosition[] {
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition()
-          });
+          };
   private Rotation2d lastGyroAngle = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
   private Twist2d trajectoryVelocity = new Twist2d();

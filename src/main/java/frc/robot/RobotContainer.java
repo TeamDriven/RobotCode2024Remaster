@@ -8,10 +8,8 @@
 package frc.robot;
 
 import static frc.robot.Constants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.Controls.*;
 import static frc.robot.Subsystems.*;
-import static frc.robot.subsystems.angleController.AngleControllerConstants.*;
 import static frc.robot.subsystems.indexer.IndexerConstants.*;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.subsystems.slapper.SlapperConstants.*;
@@ -32,19 +30,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
 import frc.robot.commands.automation.StopIntake;
 import frc.robot.commands.automation.ZeroAngle;
 // import frc.robot.commands.drivetrain.AutoTurnToGoal;
-import frc.robot.commands.drivetrain.ResetDrive;
 import frc.robot.subsystems.angleController.AngleControllerConstants;
-import frc.robot.subsystems.slapper.SlapperConstants;
-import frc.robot.subsystems.drive.*;
 import frc.robot.util.*;
 import frc.robot.util.Alert.AlertType;
 
@@ -91,12 +86,12 @@ public class RobotContainer {
                             // robotState.getEstimatedPose().getTranslation(),
                             new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
             .ignoringDisable(true)));
-    autoChooser.addOption("Blue 4 piece", drive.getAutoPath("close 4 blue"));
-    autoChooser.addOption("Red 4 piece", drive.getAutoPath("close 4 red"));
-    autoChooser.addOption("Blue Mobility", drive.getAutoPath("blue mobility"));
-    autoChooser.addOption("Red Mobility", drive.getAutoPath("red mobility"));
-    autoChooser.addOption("Red Shoot 1", drive.getAutoPath("shoot 1 red"));
-    autoChooser.addOption("Blue Shoot 1", drive.getAutoPath("shoot 1 blue"));
+    // autoChooser.addOption("Blue 4 piece", drive.getAutoPath("close 4 blue"));
+    // autoChooser.addOption("Red 4 piece", drive.getAutoPath("close 4 red"));
+    // autoChooser.addOption("Blue Mobility", drive.getAutoPath("blue mobility"));
+    // autoChooser.addOption("Red Mobility", drive.getAutoPath("red mobility"));
+    // autoChooser.addOption("Red Shoot 1", drive.getAutoPath("shoot 1 red"));
+    // autoChooser.addOption("Blue Shoot 1", drive.getAutoPath("shoot 1 blue"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -438,7 +433,8 @@ public class RobotContainer {
     //     .andThen(new SlippageCalculator(drive))
     //     .withName("Slippage Calculator");
 
-    return new RepeatCommand(drive.getAutoPath("TestAuto"));
+    return new SequentialCommandGroup(null);
+    // return new RepeatCommand(drive.getAutoPath("TestAuto"));
     // return autoChooser.getSelected();
   }
 }

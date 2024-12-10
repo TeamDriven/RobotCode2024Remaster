@@ -25,11 +25,11 @@ public class ActuationIOFalcon500 implements ActuationIO {
     actuationMotor = new TalonFX(motorID);
     throughboreEncoder = new DutyCycleEncoder(encoderChannel);
 
-    motionMagicControl = new MotionMagicVoltage(0, true, -0.3, 0, false, false, false);
-    voltageOut = new VoltageOut(0, true, false, false, false);
+    motionMagicControl = new MotionMagicVoltage(0);
+    voltageOut = new VoltageOut(0);
     stopMode = new NeutralOut();
 
-    syncPosition(throughboreEncoder.getAbsolutePosition() / encoderRotationsPerDegree - offset);
+    syncPosition(throughboreEncoder.get() / encoderRotationsPerDegree - offset);
 
     TalonFXConfiguration configs = new TalonFXConfiguration();
 
@@ -71,18 +71,18 @@ public class ActuationIOFalcon500 implements ActuationIO {
   @Override
   public void updateInputs(ActuationIOInputs inputs) {
     inputs.encoderAngle =
-        throughboreEncoder.getAbsolutePosition() / encoderRotationsPerDegree - offset;
+        throughboreEncoder.get() / encoderRotationsPerDegree - offset;
     inputs.motorAngle = actuationMotor.getPosition().getValueAsDouble() / motorRotationsPerDegree;
   }
 
   @Override
   public void setAngle(double angle) {
-    actuationMotor.setControl(motionMagicControl.withPosition(angle * motorRotationsPerDegree));
+    actuationMotor.setControl(motionMagicControl.withPosition(angle * motorRotationsPerDegree).withEnableFOC(true).withFeedForward(-0.3).withSlot(0));
   }
 
   @Override
   public void runVoltage(double voltage) {
-    actuationMotor.setControl(voltageOut.withOutput(voltage));
+    actuationMotor.setControl(voltageOut.withOutput(voltage).withEnableFOC(true));
   }
 
   @Override

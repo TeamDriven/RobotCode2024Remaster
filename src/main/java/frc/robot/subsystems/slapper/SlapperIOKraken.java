@@ -18,7 +18,6 @@ public class SlapperIOKraken implements SlapperIO {
   private DutyCycleEncoder throughboreEncoder;
   // private Encoder quadrutureEncoder = new Encoder(6, 5);
 
-  MotionMagicVoltage motionMagicControl;
   VoltageOut voltageControl;
   NeutralOut stopMode;
 
@@ -26,9 +25,7 @@ public class SlapperIOKraken implements SlapperIO {
     slapperMotor = new TalonFX(motorID);
     throughboreEncoder = new DutyCycleEncoder(encoderID);
 
-    motionMagicControl = new MotionMagicVoltage(0, true, -0.65, 0, false, false, false);
-
-    voltageControl = new VoltageOut(0, true, false, false, false);
+    voltageControl = new VoltageOut(0);
 
     stopMode = new NeutralOut();
 
@@ -79,7 +76,7 @@ public class SlapperIOKraken implements SlapperIO {
     inputs.motorPosition = slapperMotor.getPosition().getValueAsDouble();
     inputs.motorVelocity = slapperMotor.getVelocity().getValueAsDouble();
     inputs.encoderAngle =
-        throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree
+        throughboreEncoder.get() / SlapperConstants.rotationsPerDegree
             - SlapperConstants.slapperOffset;
     ;
   }
@@ -96,13 +93,13 @@ public class SlapperIOKraken implements SlapperIO {
     double power = posPID.calculate(getPosition(), desiredPos) + feedForward;
     power = MathUtil.clamp(power, -1.5, 2);
 
-    slapperMotor.setControl(voltageControl.withOutput(power));
+    slapperMotor.setControl(voltageControl.withOutput(power).withEnableFOC(true));
   }
 
   public double getPosition() {
     // return throughboreEncoder.getDistance() - slapperOffset;
     // return slapperMotor.getPosition().getValueAsDouble() / slapperTicksPerDegree;
-    return throughboreEncoder.getAbsolutePosition() / SlapperConstants.rotationsPerDegree
+    return throughboreEncoder.get() / SlapperConstants.rotationsPerDegree
         - SlapperConstants.slapperOffset;
   }
 
