@@ -4,6 +4,8 @@ import static frc.robot.subsystems.angleController.AngleControllerConstants.rota
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.AngleController.AngleControllerIOInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 /** The AngleController class represents a subsystem that controls the angle of the shooter. */
