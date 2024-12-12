@@ -27,6 +27,7 @@ import frc.robot.subsystems.drive.controllers.SimpleDriveController;
 import frc.robot.subsystems.drive.controllers.TeleopDriveController;
 import frc.robot.util.EqualsUtil;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.SwerveDriveWheelPositions;
 import frc.robot.util.swerve.ModuleLimits;
 import frc.robot.util.swerve.SwerveSetpoint;
 import frc.robot.util.swerve.SwerveSetpointGenerator;
@@ -87,7 +88,7 @@ public class Drive extends SubsystemBase {
   private final Module[] modules = new Module[4];
 
   // Store previous positions and time for filtering odometry data
-  private SwerveModulePosition[] lastPositions = null;
+  private SwerveDriveWheelPositions lastPositions = null;
   private double lastTime = 0.0;
 
   /** Active drive mode. */
@@ -181,22 +182,22 @@ public class Drive extends SubsystemBase {
       Rotation2d yaw = gyroInputs.connected ? gyroInputs.odometryYawPositions[i] : null;
       // Get all four swerve module positions at that odometry update
       // and store in SwerveDriveWheelPositions object
-      SwerveModulePosition[] wheelPositions =
-          
+      SwerveDriveWheelPositions wheelPositions =
+          new SwerveDriveWheelPositions(
               Arrays.stream(modules)
                   .map(module -> module.getModulePositions()[odometryIndex])
-                  .toArray(SwerveModulePosition[]::new);
+                  .toArray(SwerveModulePosition[]::new));
       // Filtering based on delta wheel positions
       boolean includeMeasurement = true;
       if (lastPositions != null) {
         double dt = odometryTimestampInputs.timestamps[i] - lastTime;
         for (int j = 0; j < modules.length; j++) {
           double velocity =
-              (wheelPositions[j].distanceMeters
-                      - lastPositions[j].distanceMeters)
+              (wheelPositions.positions[j].distanceMeters
+                      - lastPositions.positions[j].distanceMeters)
                   / dt;
           double omega =
-              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
+              wheelPositions.positions[j].angle.minus(lastPositions.positions[j].angle).getRadians()
                   / dt;
           // Check if delta is too large
           if (Math.abs(omega) > currentModuleLimits.maxSteeringVelocity() * 5.0

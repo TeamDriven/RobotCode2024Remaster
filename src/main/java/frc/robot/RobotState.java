@@ -16,13 +16,14 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.SwerveDriveWheelPositions;
 import frc.robot.util.swerve.ModuleLimits;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
   public record OdometryObservation(
-    SwerveModulePosition[] wheelPositions, Rotation2d gyroAngle, double timestamp) {}
+    SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {}
 
   public record VisionObservation(Pose2d visionPose, double timestamp) {}
 
@@ -43,13 +44,14 @@ public class RobotState {
   private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
   // Odometry
   private final SwerveDriveKinematics kinematics;
-  private SwerveModulePosition[] lastWheelPositions =
+  private SwerveDriveWheelPositions lastWheelPositions =
+      new SwerveDriveWheelPositions(
           new SwerveModulePosition[] {
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition()
-          };
+          });
   private Rotation2d lastGyroAngle = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
   private Twist2d trajectoryVelocity = new Twist2d();
@@ -63,7 +65,7 @@ public class RobotState {
 
   /** Add odometry observation */
   public void addOdometryObservation(OdometryObservation observation) {
-    Twist2d twist = kinematics.toTwist2d(lastWheelPositions, observation.wheelPositions());
+    Twist2d twist = kinematics.toTwist2d(lastWheelPositions.positions, observation.wheelPositions().positions);
     lastWheelPositions = observation.wheelPositions();
     // Check gyro connected
     if (observation.gyroAngle != null) {

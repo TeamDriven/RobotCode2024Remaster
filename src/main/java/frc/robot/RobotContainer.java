@@ -192,27 +192,27 @@ public class RobotContainer {
 
     new Trigger(() -> !isIntaking).onTrue(new StopIntake());
 
-    climberUp.whileTrue(new InstantCommand(() -> climber.runVoltage(12)));
+    // climberUp.whileTrue(new InstantCommand(() -> climber.runVoltage(12)));
 
-    climberDown.whileTrue(new InstantCommand(() -> climber.runVoltage(-12)));
+    // climberDown.whileTrue(new InstantCommand(() -> climber.runVoltage(-12)));
 
     // driver.y().whileTrue(slapper.runVoltageCommand(-0.1));
     // driver.a().whileTrue(slapper.runVoltageCommand(0.1));
 
-    manualOut
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.runVoltage(-4)),
-                new InstantCommand(
-                    () -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
-        .onFalse(new InstantCommand(() -> intake.stopMotor()));
+    // manualOut
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(() -> intake.runVoltage(-4)),
+    //             new InstantCommand(
+    //                 () -> indexer.runIndexer(-indexerVelocity, indexerAcceleration))))
+    //     .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
-    manualIn
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.runVoltage(4)),
-                new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration))))
-        .onFalse(new InstantCommand(() -> intake.stopMotor()));
+    // manualIn
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(() -> intake.runVoltage(4)),
+    //             new InstantCommand(() -> indexer.runIndexer(indexerVelocity, indexerAcceleration))))
+    //     .onFalse(new InstantCommand(() -> intake.stopMotor()));
 
     // On Stop Shooting
     // new Trigger(() -> currentShootingState.equals(shootingState.IDLE))
