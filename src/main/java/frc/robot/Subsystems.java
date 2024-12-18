@@ -4,23 +4,14 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.limelightIntake.LimelightIntake;
-import frc.robot.subsystems.limelightIntake.LimelightIntakeIO;
-import frc.robot.subsystems.limelightIntake.LimelightIntakeIOLimelight;
-import frc.robot.subsystems.limelightShooter.LimelightShooter;
-import frc.robot.subsystems.limelightShooter.LimelightShooterIO;
-import frc.robot.subsystems.limelightShooter.LimelightShooterIOLimelight;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.actuation.Actuation;
 import frc.robot.subsystems.actuation.ActuationIO;
-import frc.robot.subsystems.actuation.ActuationIOFalcon500;
 import frc.robot.subsystems.angleController.AngleController;
 import frc.robot.subsystems.angleController.AngleControllerIO;
-import frc.robot.subsystems.angleController.AngleControllerIOKraken;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
-import frc.robot.subsystems.climber.ClimberIOKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -29,31 +20,29 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOKrakenFOC;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
-import frc.robot.subsystems.indexer.IndexerIOKraken;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOKraken;
-import frc.robot.subsystems.shooter.ShooterIOKraken;
 import frc.robot.subsystems.slapper.Slapper;
 import frc.robot.subsystems.slapper.SlapperIO;
-import frc.robot.subsystems.slapper.SlapperIOKraken;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 
 /**
  * The Subsystems class represents the collection of subsystems used in the robot. It provides
  * static references to various subsystem objects that are used in the robot.
  */
 public final class Subsystems {
+  public static final Actuation actuation = new Actuation(new ActuationIO() {}); // My actuation
   public static final Intake intake = new Intake(new IntakeIO() {}); // My intake
   public static final Shooter shooter = new Shooter(new ShooterIO() {}); // My shooter
   public static final Indexer indexer = new Indexer(new IndexerIO() {}); // My indexer
   public static final Climber climber = new Climber(new ClimberIO() {}); // My climber
   public static final AngleController angleController = new AngleController(new AngleControllerIO() {}); // My angle controller
-  public static final LimelightShooter limelightShooter = new LimelightShooter(new LimelightShooterIO() {}); // My limelight for the shooter
-  public static final LimelightIntake limelightIntake = new LimelightIntake(new LimelightIntakeIO() {}); // My limelight for the intake
   public static final Slapper slapper = new Slapper(new SlapperIO() {}); // My slapper
 
   public static final Drive drive;
-  public static final Actuation actuation = new Actuation(new ActuationIO() {}); // My actuation
+  public static final Vision mainVision;
 
   static {
     // Create subsystems
@@ -67,6 +56,7 @@ public final class Subsystems {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
+          mainVision = new Vision("MainVision", new VisionIOLimelight("limelight"), drive::getSpeeds);
           // actuation = new Actuation(new ActuationIOFalcon500(14, 6));
           // shooter = new Shooter(new ShooterIOKraken(15, 16));
           // climber = new Climber(new ClimberIOKraken(18));
@@ -74,8 +64,6 @@ public final class Subsystems {
           // angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           // slapper = new Slapper(new SlapperIOKraken(20, 5));
           // intake = new Intake(new IntakeIOKraken(13, 0, 1));
-          // limelightIntake = new LimelightIntake(new LimelightIntakeIOLimelight());
-          // limelightShooter = new LimelightShooter(new LimelightShooterIOLimelight());
         }
         case DEVBOT -> {
           drive =
@@ -85,6 +73,7 @@ public final class Subsystems {
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[1]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[2]),
                   new ModuleIOKrakenFOC(DriveConstants.moduleConfigs[3]));
+          mainVision = new Vision("MainVision", new VisionIOLimelight("limelight"), drive::getSpeeds);
           // actuation = new Actuation(new ActuationIOFalcon500(14, 6));
           // shooter = new Shooter(new ShooterIOKraken(15, 16));
           // climber = new Climber(new ClimberIOKraken(18));
@@ -92,8 +81,6 @@ public final class Subsystems {
           // angleController = new AngleController(new AngleControllerIOKraken(19, 14));
           // slapper = new Slapper(new SlapperIOKraken(20, 5));
           // intake = new Intake(new IntakeIOKraken(13, 0, 1));
-          // limelightIntake = new LimelightIntake(new LimelightIntakeIOLimelight());
-          // limelightShooter = new LimelightShooter(new LimelightShooterIOLimelight());
         }
         case SIMBOT -> {
           throw new IllegalStateException("SIMBOT is not currently implemented on this robot");
@@ -110,6 +97,7 @@ public final class Subsystems {
               new ModuleIO() {},
               new ModuleIO() {},
               new ModuleIO() {});
+      mainVision = new Vision("MainVision", new VisionIO() {}, drive::getSpeeds);
       // actuation = new Actuation(new ActuationIO() {});
       // climber = new Climber(new ClimberIO() {});
       // angleController = new AngleController(new AngleControllerIO() {});
@@ -117,8 +105,6 @@ public final class Subsystems {
       // indexer = new Indexer(new IndexerIO() {});
       // intake = new Intake(new IntakeIO() {});
       // shooter = new Shooter(new ShooterIO() {});
-      // limelightIntake = new LimelightIntake(new LimelightIntakeIO() {});
-      // limelightShooter = new LimelightShooter(new LimelightShooterIO() {});
     }
   }
 }

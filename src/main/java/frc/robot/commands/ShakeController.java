@@ -1,13 +1,9 @@
 package frc.robot.commands;
 
 import static frc.robot.Constants.*;
-import static frc.robot.Subsystems.*;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.limelightShooter.LimelightShooterIOLimelight.*;
-import frc.robot.subsystems.limelightIntake.LimelightIntakeIOLimelight.*;
 
 /**
  * The ShakeController class represents a command that shakes the controller for a specified
@@ -33,15 +29,15 @@ public class ShakeController extends Command {
   public void initialize() {
     startingTime = System.currentTimeMillis();
     driver.getHID().setRumble(RumbleType.kBothRumble, rumbleIntensity);
-    new InstantCommand(() -> limelightIntake.setLights(IntakeLightMode.BLINK));
-    new InstantCommand(() -> limelightShooter.setLights(ShooterLightMode.BLINK));
+    // new InstantCommand(() -> limelightIntake.setLights(IntakeLightMode.BLINK));
+    // new InstantCommand(() -> limelightShooter.setLights(ShooterLightMode.BLINK));
   }
 
   @Override
   public void end(boolean interrupted) {
     driver.getHID().setRumble(RumbleType.kBothRumble, 0);
-    new InstantCommand(() -> limelightIntake.setLights(IntakeLightMode.DEFAULT));
-    new InstantCommand(() -> limelightShooter.setLights(ShooterLightMode.DEFAULT));
+    // new InstantCommand(() -> limelightIntake.setLights(IntakeLightMode.DEFAULT));
+    // new InstantCommand(() -> limelightShooter.setLights(ShooterLightMode.DEFAULT));
   }
 
   @Override

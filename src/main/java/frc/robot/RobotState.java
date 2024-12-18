@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.*;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -15,9 +16,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.SwerveDriveWheelPositions;
 import frc.robot.util.swerve.ModuleLimits;
+
+import static frc.robot.Subsystems.drive;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -25,9 +33,11 @@ public class RobotState {
   public record OdometryObservation(
     SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {}
 
-  public record VisionObservation(Pose2d visionPose, double timestamp) {}
+  public record VisionObservation(Pose2d visionPose, double timestamp, Vector<N3> stdDevs) {}
 
   private static final double poseBufferSizeSeconds = 2.0;
+
+  private static final Lock odometryLock = new ReentrantLock();
 
   private static RobotState instance;
 
@@ -55,12 +65,14 @@ public class RobotState {
   private Rotation2d lastGyroAngle = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
   private Twist2d trajectoryVelocity = new Twist2d();
+  private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
   private RobotState() {
     for (int i = 0; i < 3; ++i) {
       qStdDevs.set(i, 0, Math.pow(DriveConstants.odometryStateStdDevs.get(i, 0), 2));
     }
     kinematics = DriveConstants.kinematics;
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(kinematics, odometryPose.getRotation(), lastWheelPositions.positions, estimatedPose);
   }
 
   /** Add odometry observation */
@@ -75,21 +87,33 @@ public class RobotState {
               twist.dx, twist.dy, observation.gyroAngle().minus(lastGyroAngle).getRadians());
       lastGyroAngle = observation.gyroAngle();
     }
+
+    odometryLock.lock();
+
     // Add twist to odometry pose
     odometryPose = odometryPose.exp(twist);
     // Add pose to buffer at timestamp
     poseBuffer.addSample(observation.timestamp(), odometryPose);
-    // Calculate diff from last odometry pose and add onto pose estimate
-    estimatedPose = estimatedPose.exp(twist);
+    // // Calculate diff from last odometry pose and add onto pose estimate
+    // estimatedPose = estimatedPose.exp(twist);
+
+    swerveDrivePoseEstimator.updateWithTime(observation.timestamp(), observation.gyroAngle(), observation.wheelPositions().positions);
+    estimatedPose = swerveDrivePoseEstimator.getEstimatedPosition();
+
+    odometryLock.unlock();
   }
 
   // The chance of this fully working is low
   public void addVisionObservation(VisionObservation observation) {
+    odometryLock.lock();
+
     // If measurement is old enough to be outside the pose buffer's timespan, skip.
     Logger.recordOutput("Limelight/SentPose", observation.visionPose);
 
-    estimatedPose =
-        new Pose2d(observation.visionPose.getTranslation(), estimatedPose.getRotation());
+    swerveDrivePoseEstimator.addVisionMeasurement(observation.visionPose(), observation.timestamp(), observation.stdDevs());
+    estimatedPose = swerveDrivePoseEstimator.getEstimatedPosition();
+
+    odometryLock.unlock();
   }
 
   public void addVelocityData(Twist2d robotVelocity) {
@@ -113,6 +137,7 @@ public class RobotState {
   public void resetPose(Pose2d initialPose) {
     estimatedPose = initialPose;
     odometryPose = initialPose;
+    swerveDrivePoseEstimator.resetPose(initialPose);
     poseBuffer.clear();
   }
 
