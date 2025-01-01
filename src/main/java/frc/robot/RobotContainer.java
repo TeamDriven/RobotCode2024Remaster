@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.SlippageCalculator;
+import frc.robot.commands.StaticCharacterization;
 import frc.robot.commands.automation.AutoShootSequence;
 import frc.robot.commands.automation.PickUpPiece;
 import frc.robot.commands.automation.PickUpPieceAuto;
@@ -178,8 +180,7 @@ public class RobotContainer {
                 () ->
                     robotState.resetPose(
                         new Pose2d(
-                            // robotState.getEstimatedPose().getTranslation(),
-                            new Translation2d(), AllianceFlipUtil.apply(new Rotation2d()))))
+                            robotState.getEstimatedPose().getTranslation(), AllianceFlipUtil.apply(new Rotation2d()))))
             .ignoringDisable(true));
 
     // runIntake.onTrue(new PickUpPiece(intakeVoltage)).onFalse(new StopIntake());
@@ -406,9 +407,9 @@ public class RobotContainer {
 
     // Drive Static
     // Characterization
-    // return new StaticCharacterization(
-    //         drive, drive::runCharacterization, drive::getCharacterizationVelocity)
-    //     .finallyDo(drive::endCharacterization);
+    return new StaticCharacterization(
+            drive, drive::runCharacterization, drive::getCharacterizationVelocity)
+        .finallyDo(drive::endCharacterization);
 
     // Drive FF Characterization
     // return new FeedForwardCharacterization(
@@ -433,7 +434,7 @@ public class RobotContainer {
     //     .andThen(new SlippageCalculator(drive))
     //     .withName("Slippage Calculator");
 
-    return new SequentialCommandGroup(null);
+    // return new SequentialCommandGroup(null);
     // return new RepeatCommand(drive.getAutoPath("TestAuto"));
     // return autoChooser.getSelected();
   }

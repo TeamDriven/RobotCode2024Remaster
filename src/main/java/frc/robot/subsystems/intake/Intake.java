@@ -59,7 +59,7 @@ public class Intake extends SubsystemBase {
     };
   }
 
-  public void feedMotor(double voltage, double acceleration) {
+  public void feedMotor(double velocity, double acceleration) {
     this.velocity = velocity;
     this.acceleration = acceleration;
     mode = controlMode.FEED;

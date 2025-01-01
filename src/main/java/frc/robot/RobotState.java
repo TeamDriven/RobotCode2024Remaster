@@ -96,8 +96,9 @@ public class RobotState {
     poseBuffer.addSample(observation.timestamp(), odometryPose);
     // // Calculate diff from last odometry pose and add onto pose estimate
     // estimatedPose = estimatedPose.exp(twist);
-
-    swerveDrivePoseEstimator.updateWithTime(observation.timestamp(), observation.gyroAngle(), observation.wheelPositions().positions);
+    if (observation.gyroAngle != null) {
+      swerveDrivePoseEstimator.updateWithTime(observation.timestamp(), observation.gyroAngle(), observation.wheelPositions().positions);
+    }
     estimatedPose = swerveDrivePoseEstimator.getEstimatedPosition();
 
     odometryLock.unlock();

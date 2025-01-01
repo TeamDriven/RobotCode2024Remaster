@@ -63,7 +63,11 @@ public class SimpleDriveController {
   public static Translation2d calcLinearVelocity(double x, double y) {
     // Apply deadband
     double linearMagnitude = Math.hypot(x, y);
-    Rotation2d linearDirection = new Rotation2d(x, y);
+    Rotation2d linearDirection = new Rotation2d();
+    // Have to do this in order to silence an error for some reason
+    if (x != 0 || y != 0) {
+      linearDirection = new Rotation2d(x, y);
+    }
 
     // Square magnitude
     linearMagnitude = linearMagnitude * linearMagnitude;
